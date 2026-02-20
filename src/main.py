@@ -9,10 +9,13 @@ from datetime import datetime
 from pathlib import Path
 import uvicorn
 import os
+import csv
+import json
 
 from src.config import settings
 from src.local_storage import LocalStorageService
 from src.openai_service import OpenAIService
+from src.local_ml_service import LocalMLService
 
 # ML 서비스는 선택사항이므로 지연 로딩
 ml_service = None
@@ -60,11 +63,20 @@ async def read_root():
         "docs": "/docs"
     }
 
+@app.get("/details")
+async def read_details():
+    """모델 성능 테스트 페이지 제공"""
+    details_file = os.path.join(static_dir, "details.html")
+    if os.path.exists(details_file):
+        return FileResponse(details_file)
+    raise HTTPException(status_code=404, detail="Details page not found")
+
 # 서비스 인스턴스
 # 프로젝트 루트의 data 폴더에 저장
 project_root = Path(__file__).parent.parent
 data_dir = project_root / "data"
 local_storage = LocalStorageService(base_dir=str(data_dir))
+local_ml_service = LocalMLService(models_dir=str(data_dir / "models"))
 openai_service = None
 
 try:
@@ -261,6 +273,79 @@ async def get_stored_file(file_name: str):
         raise HTTPException(status_code=500, detail=f"파일 조회 실패: {str(e)}")
 
 
+class TrainModelRequest(BaseModel):
+    model_name: str
+    training_data: List[Dict[str, Any]]
+    target_column: str = "target"
+    save_data_file: bool = True  # 학습 데이터를 파일로 저장할지 여부
+
+
+@app.post("/api/ml/train")
+async def train_model(request: TrainModelRequest):
+    """
+    로컬에서 ML 모델 학습
+    
+    Args:
+        request: 학습 요청 데이터
+        
+    Returns:
+        학습 결과
+    """
+    try:
+        # 학습 데이터를 파일로 저장 (선택사항)
+        if request.save_data_file:
+            training_dir = data_dir / "training"
+            training_dir.mkdir(exist_ok=True)
+            
+            import csv
+            import json
+            
+            # CSV 파일로 저장
+            csv_path = training_dir / f"{request.model_name}_training_data.csv"
+            if request.training_data:
+                # 피처 이름 추출
+                feature_names = [key for key in request.training_data[0].keys() if key != request.target_column]
+                headers = feature_names + [request.target_column]
+                
+                with open(csv_path, 'w', newline='', encoding='utf-8') as f:
+                    writer = csv.DictWriter(f, fieldnames=headers)
+                    writer.writeheader()
+                    for row in request.training_data:
+                        writer.writerow(row)
+            
+            # JSON 파일로도 저장 (백업)
+            json_path = training_dir / f"{request.model_name}_training_data.json"
+            with open(json_path, 'w', encoding='utf-8') as f:
+                json.dump(request.training_data, f, indent=2, ensure_ascii=False)
+        
+        # 피처 이름 추출
+        feature_names = None
+        if request.training_data:
+            feature_names = [key for key in request.training_data[0].keys() if key != request.target_column]
+        
+        model_path = local_ml_service.train_model(
+            model_name=request.model_name,
+            training_data=request.training_data,
+            target_column=request.target_column,
+            feature_names=feature_names
+        )
+        
+        if not model_path:
+            raise HTTPException(status_code=500, detail="모델 학습 실패")
+        
+        model_info = local_ml_service.get_model_info(request.model_name)
+        
+        return {
+            "success": True,
+            "model_name": request.model_name,
+            "model_path": model_path,
+            "model_info": model_info,
+            "data_saved": request.save_data_file
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"학습 중 오류 발생: {str(e)}")
+
+
 @app.post("/api/ml/predict")
 async def ml_predict(model_name: str, data: Dict[str, Any]):
     """
@@ -273,18 +358,57 @@ async def ml_predict(model_name: str, data: Dict[str, Any]):
     Returns:
         예측 결과
     """
-    if ml_service is None:
-        raise HTTPException(status_code=503, detail="ML 서비스가 사용 불가능합니다")
     try:
-        result = ml_service.predict(model_name, data)
+        result = local_ml_service.predict(model_name, data)
         if not result:
-            raise HTTPException(status_code=500, detail="예측 실패")
+            raise HTTPException(status_code=404, detail=f"모델 '{model_name}'을 찾을 수 없습니다")
         return {
             "success": True,
-            "prediction": result
+            **result
         }
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"예측 중 오류 발생: {str(e)}")
+
+
+@app.get("/api/ml/models")
+async def list_models():
+    """저장된 모델 목록 조회"""
+    try:
+        models = local_ml_service.list_models()
+        models_info = []
+        for model_name in models:
+            info = local_ml_service.get_model_info(model_name)
+            if info:
+                models_info.append(info)
+        
+        return {
+            "success": True,
+            "models": models,
+            "models_info": models_info,
+            "count": len(models)
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"모델 목록 조회 실패: {str(e)}")
+
+
+@app.delete("/api/ml/models/{model_name}")
+async def delete_model(model_name: str):
+    """모델 삭제"""
+    try:
+        success = local_ml_service.delete_model(model_name)
+        if not success:
+            raise HTTPException(status_code=404, detail=f"모델 '{model_name}'을 찾을 수 없습니다")
+        
+        return {
+            "success": True,
+            "message": f"모델 '{model_name}'이 삭제되었습니다."
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"모델 삭제 실패: {str(e)}")
 
 
 class ChatRequest(BaseModel):

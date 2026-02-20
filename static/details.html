@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>모델 성능 테스트 - ML Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .nav-bar {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .nav-link {
+            display: inline-block;
+            padding: 10px 20px;
+            color: white;
+            text-decoration: none;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            margin: 0 10px;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .models-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .model-card {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .model-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .model-card h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .model-info {
+            margin-bottom: 10px;
+        }
+
+        .model-info strong {
+            color: #333;
+            display: inline-block;
+            width: 120px;
+        }
+
+        .model-info span {
+            color: #666;
+        }
+
+        .score-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.9em;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .score-high {
+            background: #4caf50;
+            color: white;
+        }
+
+        .score-medium {
+            background: #ff9800;
+            color: white;
+        }
+
+        .score-low {
+            background: #f44336;
+            color: white;
+        }
+
+        .test-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .result-box {
+            margin-top: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            display: none;
+        }
+
+        .result-box.show {
+            display: block;
+        }
+
+        .result-box h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .result-content {
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .refresh-btn {
+            margin-bottom: 20px;
+            float: right;
+        }
+
+        .auto-refresh-toggle {
+            margin-bottom: 20px;
+            float: right;
+            margin-right: 10px;
+        }
+
+        .toggle-switch {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 15px;
+            border-radius: 8px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #667eea;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .clearfix::after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+
+        .delete-btn {
+            background: #f44336;
+            padding: 6px 12px;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
+        .delete-btn:hover {
+            background: #d32f2f;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        .status-online {
+            background: #4caf50;
+        }
+
+        .status-offline {
+            background: #999;
+            animation: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 모델 성능 테스트</h1>
+            <p>학습된 머신러닝 모델의 성능을 확인하고 테스트하세요</p>
+        </div>
+
+        <div class="nav-bar">
+            <a href="/" class="nav-link">🏠 채팅</a>
+            <a href="/details" class="nav-link">📊 모델 대시보드</a>
+            <a href="/docs" class="nav-link">📚 API 문서</a>
+        </div>
+
+        <div class="content">
+            <div class="section clearfix">
+                <div class="auto-refresh-toggle">
+                    <label class="toggle-switch">
+                        <span class="status-indicator" id="status-indicator"></span>
+                        <span>자동 새로고침</span>
+                        <label class="switch">
+                            <input type="checkbox" id="auto-refresh-toggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </label>
+                </div>
+                <button class="refresh-btn" onclick="loadModels()">🔄 새로고침</button>
+                <h2>저장된 모델 목록 <span id="model-count"></span></h2>
+                
+                <div class="loading" id="loading-models">
+                    <div class="spinner"></div>
+                    <p style="margin-top: 10px;">모델 목록 로딩 중...</p>
+                </div>
+
+                <div id="models-container" class="models-grid"></div>
+            </div>
+
+            <div class="section">
+                <h2>모델 학습</h2>
+                <div class="test-section">
+                    <form id="train-form" onsubmit="trainModel(event)">
+                        <div class="form-group">
+                            <label for="train-model-name">모델 이름 *</label>
+                            <input type="text" id="train-model-name" required 
+                                   placeholder="예: stock_price_predictor">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="train-target-column">타겟 컬럼명 *</label>
+                            <input type="text" id="train-target-column" required 
+                                   placeholder="예: target" value="target">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="train-data">학습 데이터 (JSON 배열 형식) *</label>
+                            <textarea id="train-data" required rows="10" 
+                                      placeholder='예: [
+  {"price": 100, "volume": 1000, "target": 105},
+  {"price": 110, "volume": 1200, "target": 115},
+  {"price": 120, "volume": 1500, "target": 125}
+]'></textarea>
+                            <small style="color: #666; display: block; margin-top: 5px;">
+                                💡 각 객체는 피처(입력)와 타겟(출력)을 포함해야 합니다.
+                            </small>
+                        </div>
+
+                        <div class="form-group">
+                            <label>또는 파일 업로드</label>
+                            <input type="file" id="train-file" accept=".json,.csv" 
+                                   onchange="handleFileUpload(event)">
+                            <small style="color: #666; display: block; margin-top: 5px;">
+                                💡 JSON 또는 CSV 파일을 업로드할 수 있습니다. CSV 파일은 자동으로 변환됩니다.
+                            </small>
+                        </div>
+
+                        <div class="form-group checkbox-group">
+                            <input type="checkbox" id="save-data-file" checked>
+                            <label for="save-data-file" style="margin: 0;">학습 데이터를 data/training/ 폴더에 저장</label>
+                        </div>
+
+                        <button type="submit">🚀 모델 학습 시작</button>
+                    </form>
+
+                    <div class="loading" id="loading-train">
+                        <div class="spinner"></div>
+                        <p style="margin-top: 10px;">모델 학습 중...</p>
+                    </div>
+
+                    <div class="result-box" id="train-result">
+                        <h4>학습 결과</h4>
+                        <div class="result-content" id="train-content"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>모델 테스트</h2>
+                <div class="test-section">
+                    <form id="test-form" onsubmit="testModel(event)">
+                        <div class="form-group">
+                            <label for="test-model-name">모델 선택</label>
+                            <select id="test-model-name" required>
+                                <option value="">모델을 선택하세요...</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="test-data">테스트 데이터 (JSON 형식)</label>
+                            <input type="text" id="test-data" required 
+                                   placeholder='예: {"price": 100, "volume": 1000}'>
+                        </div>
+
+                        <button type="submit">예측 실행</button>
+                    </form>
+
+                    <div class="loading" id="loading-test">
+                        <div class="spinner"></div>
+                        <p style="margin-top: 10px;">예측 중...</p>
+                    </div>
+
+                    <div class="result-box" id="test-result">
+                        <h4>예측 결과</h4>
+                        <div class="result-content" id="test-content"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = window.location.origin;
+        let autoRefreshInterval = null;
+        let autoRefreshEnabled = true;
+        const REFRESH_INTERVAL = 3000; // 3초마다 새로고침
+
+        // 페이지 로드 시 모델 목록 불러오기
+        window.addEventListener('DOMContentLoaded', () => {
+            loadModels();
+            setupAutoRefresh();
+        });
+
+        // 자동 새로고침 설정
+        function setupAutoRefresh() {
+            const toggle = document.getElementById('auto-refresh-toggle');
+            const statusIndicator = document.getElementById('status-indicator');
+            
+            toggle.addEventListener('change', (e) => {
+                autoRefreshEnabled = e.target.checked;
+                if (autoRefreshEnabled) {
+                    startAutoRefresh();
+                    statusIndicator.classList.remove('status-offline');
+                    statusIndicator.classList.add('status-online');
+                } else {
+                    stopAutoRefresh();
+                    statusIndicator.classList.remove('status-online');
+                    statusIndicator.classList.add('status-offline');
+                }
+            });
+
+            if (autoRefreshEnabled) {
+                startAutoRefresh();
+                statusIndicator.classList.add('status-online');
+            } else {
+                statusIndicator.classList.add('status-offline');
+            }
+        }
+
+        function startAutoRefresh() {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+            }
+            autoRefreshInterval = setInterval(() => {
+                loadModels(true); // silent 모드로 업데이트
+            }, REFRESH_INTERVAL);
+        }
+
+        function stopAutoRefresh() {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+                autoRefreshInterval = null;
+            }
+        }
+
+        // 모델 목록 로드
+        async function loadModels(silent = false) {
+            const container = document.getElementById('models-container');
+            const loading = document.getElementById('loading-models');
+            
+            if (!silent) {
+                loading.classList.add('show');
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/ml/models`);
+                const data = await response.json();
+
+                if (response.ok && data.models && data.models.length > 0) {
+                    // 모델 개수 업데이트
+                    document.getElementById('model-count').textContent = `(${data.models.length}개)`;
+
+                    // 모델 선택 드롭다운 업데이트
+                    const select = document.getElementById('test-model-name');
+                    const currentValue = select.value;
+                    select.innerHTML = '<option value="">모델을 선택하세요...</option>';
+                    
+                    // 기존 카드 제거
+                    container.innerHTML = '';
+                    
+                    data.models_info.forEach(info => {
+                        // 카드 생성
+                        const card = createModelCard(info);
+                        container.appendChild(card);
+
+                        // 드롭다운 옵션 추가
+                        const option = document.createElement('option');
+                        option.value = info.model_name;
+                        option.textContent = info.model_name;
+                        select.appendChild(option);
+                    });
+
+                    // 이전 선택값 복원
+                    if (currentValue && data.models.includes(currentValue)) {
+                        select.value = currentValue;
+                    }
+                } else {
+                    document.getElementById('model-count').textContent = '(0개)';
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📦</div>
+                            <h3>저장된 모델이 없습니다</h3>
+                            <p>모델을 학습시켜야 합니다. API 문서를 참고하세요.</p>
+                        </div>
+                    `;
+                    const select = document.getElementById('test-model-name');
+                    select.innerHTML = '<option value="">모델을 선택하세요...</option>';
+                }
+            } catch (error) {
+                if (!silent) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">❌</div>
+                            <h3>오류 발생</h3>
+                            <p>${error.message}</p>
+                        </div>
+                    `;
+                }
+            } finally {
+                loading.classList.remove('show');
+            }
+        }
+
+        // 모델 카드 생성
+        function createModelCard(info) {
+            const card = document.createElement('div');
+            card.className = 'model-card';
+
+            const trainScore = (info.train_score * 100).toFixed(2);
+            const testScore = (info.test_score * 100).toFixed(2);
+            
+            const trainBadgeClass = info.train_score >= 0.8 ? 'score-high' : 
+                                    info.train_score >= 0.6 ? 'score-medium' : 'score-low';
+            const testBadgeClass = info.test_score >= 0.8 ? 'score-high' : 
+                                  info.test_score >= 0.6 ? 'score-medium' : 'score-low';
+
+            // 피처 중요도 표시
+            let importanceHTML = '';
+            if (info.feature_importance_sorted && info.feature_importance_sorted.length > 0) {
+                importanceHTML = '<div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #e0e0e0;">';
+                importanceHTML += '<strong style="display: block; margin-bottom: 10px; color: #667eea;">변수 중요도:</strong>';
+                
+                info.feature_importance_sorted.slice(0, 5).forEach(([name, importance]) => {
+                    const percentage = (importance * 100).toFixed(2);
+                    const barWidth = (importance * 100).toFixed(0);
+                    importanceHTML += `
+                        <div style="margin-bottom: 8px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                                <span style="font-size: 0.9em;">${name}</span>
+                                <span style="font-weight: 600; color: #667eea;">${percentage}%</span>
+                            </div>
+                            <div style="background: #e0e0e0; height: 6px; border-radius: 3px; overflow: hidden;">
+                                <div style="background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); height: 100%; width: ${barWidth}%; transition: width 0.3s;"></div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                if (info.feature_importance_sorted.length > 5) {
+                    importanceHTML += `<small style="color: #999; font-size: 0.85em;">+ ${info.feature_importance_sorted.length - 5}개 더...</small>`;
+                }
+                
+                importanceHTML += '</div>';
+            }
+
+            card.innerHTML = `
+                <h3>${info.model_name}</h3>
+                <div class="model-info">
+                    <strong>학습 일시:</strong>
+                    <span>${new Date(info.trained_at).toLocaleString('ko-KR')}</span>
+                </div>
+                <div class="model-info">
+                    <strong>학습 정확도:</strong>
+                    <span>${trainScore}%</span>
+                    <span class="score-badge ${trainBadgeClass}">${trainScore}%</span>
+                </div>
+                <div class="model-info">
+                    <strong>테스트 정확도:</strong>
+                    <span>${testScore}%</span>
+                    <span class="score-badge ${testBadgeClass}">${testScore}%</span>
+                </div>
+                <div class="model-info">
+                    <strong>학습 샘플 수:</strong>
+                    <span>${info.n_samples}개</span>
+                </div>
+                <div class="model-info">
+                    <strong>피처 수:</strong>
+                    <span>${info.n_features}개</span>
+                </div>
+                ${importanceHTML}
+                <button class="delete-btn" onclick="deleteModel('${info.model_name}')">🗑️ 삭제</button>
+            `;
+
+            return card;
+        }
+
+        // 모델 삭제
+        async function deleteModel(modelName) {
+            if (!confirm(`모델 '${modelName}'을 삭제하시겠습니까?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/ml/models/${encodeURIComponent(modelName)}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert('모델이 삭제되었습니다.');
+                    loadModels(); // 목록 새로고침
+                } else {
+                    alert(`삭제 실패: ${data.detail || '알 수 없는 오류'}`);
+                }
+            } catch (error) {
+                alert(`삭제 중 오류 발생: ${error.message}`);
+            }
+        }
+
+        // 파일 업로드 처리
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                const textarea = document.getElementById('train-data');
+                
+                if (file.name.endsWith('.json')) {
+                    try {
+                        const data = JSON.parse(content);
+                        textarea.value = JSON.stringify(data, null, 2);
+                    } catch (error) {
+                        alert('JSON 파일 파싱 오류: ' + error.message);
+                    }
+                } else if (file.name.endsWith('.csv')) {
+                    // CSV를 JSON으로 변환
+                    const lines = content.split('\n').filter(line => line.trim());
+                    const headers = lines[0].split(',').map(h => h.trim());
+                    const jsonData = [];
+                    
+                    for (let i = 1; i < lines.length; i++) {
+                        const values = lines[i].split(',').map(v => v.trim());
+                        const obj = {};
+                        headers.forEach((header, index) => {
+                            const value = values[index];
+                            // 숫자로 변환 시도
+                            const numValue = parseFloat(value);
+                            obj[header] = isNaN(numValue) ? value : numValue;
+                        });
+                        jsonData.push(obj);
+                    }
+                    
+                    textarea.value = JSON.stringify(jsonData, null, 2);
+                }
+            };
+            
+            reader.readAsText(file);
+        }
+
+        // 모델 학습
+        async function trainModel(event) {
+            event.preventDefault();
+
+            const modelName = document.getElementById('train-model-name').value;
+            const targetColumn = document.getElementById('train-target-column').value;
+            const trainDataStr = document.getElementById('train-data').value;
+            const loading = document.getElementById('loading-train');
+            const result = document.getElementById('train-result');
+            const content = document.getElementById('train-content');
+
+            result.classList.remove('show');
+
+            try {
+                // JSON 파싱
+                const trainingData = JSON.parse(trainDataStr);
+
+                if (!Array.isArray(trainingData)) {
+                    throw new Error('학습 데이터는 배열 형식이어야 합니다.');
+                }
+
+                if (trainingData.length < 10) {
+                    throw new Error('최소 10개 이상의 학습 데이터가 필요합니다.');
+                }
+
+                loading.classList.add('show');
+
+                const saveDataFile = document.getElementById('save-data-file').checked;
+
+                const response = await fetch(`${API_BASE_URL}/api/ml/train`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        model_name: modelName,
+                        training_data: trainingData,
+                        target_column: targetColumn,
+                        save_data_file: saveDataFile
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    const info = data.model_info;
+                    
+                    // 변수 중요도 표시
+                    let importanceHTML = '';
+                    if (info.feature_importance_sorted && info.feature_importance_sorted.length > 0) {
+                        importanceHTML = '<hr style="margin: 15px 0; border: none; border-top: 1px solid #e0e0e0;">';
+                        importanceHTML += '<p><strong style="color: #667eea;">변수 중요도 (상위 10개):</strong></p>';
+                        importanceHTML += '<div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 10px;">';
+                        
+                        info.feature_importance_sorted.slice(0, 10).forEach(([name, importance], index) => {
+                            const percentage = (importance * 100).toFixed(2);
+                            const barWidth = (importance * 100).toFixed(0);
+                            importanceHTML += `
+                                <div style="margin-bottom: 12px;">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                        <span><strong>${index + 1}.</strong> ${name}</span>
+                                        <span style="font-weight: 600; color: #667eea;">${percentage}%</span>
+                                    </div>
+                                    <div style="background: #e0e0e0; height: 8px; border-radius: 4px; overflow: hidden;">
+                                        <div style="background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); height: 100%; width: ${barWidth}%;"></div>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        
+                        importanceHTML += '</div>';
+                    }
+                    
+                    content.innerHTML = `
+                        <p style="color: #4caf50; font-weight: bold;">✅ 모델 학습 완료!</p>
+                        <p><strong>모델 이름:</strong> ${info.model_name}</p>
+                        <p><strong>학습 정확도:</strong> <span style="color: #667eea; font-weight: bold;">${(info.train_score * 100).toFixed(2)}%</span></p>
+                        <p><strong>테스트 정확도:</strong> <span style="color: #667eea; font-weight: bold;">${(info.test_score * 100).toFixed(2)}%</span></p>
+                        <p><strong>학습 샘플 수:</strong> ${info.n_samples}개</p>
+                        <p><strong>피처 수:</strong> ${info.n_features}개</p>
+                        <p><strong>학습 시간:</strong> ${new Date(info.trained_at).toLocaleString('ko-KR')}</p>
+                        ${data.data_saved ? '<p style="color: #666; font-size: 0.9em;">📁 학습 데이터가 data/training/ 폴더에 저장되었습니다.</p>' : ''}
+                        ${importanceHTML}
+                        <hr style="margin: 15px 0; border: none; border-top: 1px solid #e0e0e0;">
+                        <p style="color: #666; font-size: 0.9em;">모델이 저장되었습니다. 위의 모델 목록에서 확인할 수 있습니다.</p>
+                    `;
+                    result.classList.add('show');
+                    
+                    // 모델 목록 새로고침
+                    setTimeout(() => {
+                        loadModels();
+                    }, 1000);
+                } else {
+                    content.innerHTML = `<p style="color: #f44336;">오류: ${data.detail || '알 수 없는 오류'}</p>`;
+                    result.classList.add('show');
+                }
+            } catch (error) {
+                if (error instanceof SyntaxError) {
+                    content.innerHTML = `<p style="color: #f44336;">JSON 형식이 올바르지 않습니다: ${error.message}</p>`;
+                } else {
+                    content.innerHTML = `<p style="color: #f44336;">오류 발생: ${error.message}</p>`;
+                }
+                result.classList.add('show');
+            } finally {
+                loading.classList.remove('show');
+            }
+        }
+
+        // 모델 테스트
+        async function testModel(event) {
+            event.preventDefault();
+
+            const modelName = document.getElementById('test-model-name').value;
+            const testDataStr = document.getElementById('test-data').value;
+            const loading = document.getElementById('loading-test');
+            const result = document.getElementById('test-result');
+            const content = document.getElementById('test-content');
+
+            result.classList.remove('show');
+
+            try {
+                // JSON 파싱
+                const testData = JSON.parse(testDataStr);
+
+                loading.classList.add('show');
+
+                const response = await fetch(`${API_BASE_URL}/api/ml/predict?model_name=${encodeURIComponent(modelName)}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(testData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    content.innerHTML = `
+                        <p><strong>모델:</strong> ${data.model_name}</p>
+                        <p><strong>예측값:</strong> <span style="font-size: 1.2em; color: #667eea; font-weight: bold;">${data.prediction.toFixed(4)}</span></p>
+                        <p><strong>예측 시간:</strong> ${new Date(data.timestamp).toLocaleString('ko-KR')}</p>
+                        <hr style="margin: 15px 0; border: none; border-top: 1px solid #e0e0e0;">
+                        <p><strong>입력 데이터:</strong></p>
+                        <pre style="background: #f5f5f5; padding: 10px; border-radius: 4px; overflow-x: auto;">${JSON.stringify(testData, null, 2)}</pre>
+                    `;
+                    result.classList.add('show');
+                } else {
+                    content.innerHTML = `<p style="color: #f44336;">오류: ${data.detail || '알 수 없는 오류'}</p>`;
+                    result.classList.add('show');
+                }
+            } catch (error) {
+                if (error instanceof SyntaxError) {
+                    content.innerHTML = `<p style="color: #f44336;">JSON 형식이 올바르지 않습니다: ${error.message}</p>`;
+                } else {
+                    content.innerHTML = `<p style="color: #f44336;">오류 발생: ${error.message}</p>`;
+                }
+                result.classList.add('show');
+            } finally {
+                loading.classList.remove('show');
+            }
+        }
+    </script>
+</body>
+</html>
