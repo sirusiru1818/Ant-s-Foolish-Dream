@@ -66,13 +66,13 @@ pip install -r requirements.txt
 ### 3. 애플리케이션 실행
 
 ```bash
-python -m src.main
+python run.py
 ```
 
 또는
 
 ```bash
-uvicorn src.main:app --reload --host 0.0.0.0 --port 8000
+uvicorn src.main:app --reload --host 0.0.0.0 --port 8000 --reload-exclude "venv/*"
 ```
 
 서버가 실행되면 `http://localhost:8000`에서 API를 사용할 수 있습니다.
