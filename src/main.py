@@ -80,6 +80,14 @@ async def read_personality():
         return FileResponse(personality_file)
     raise HTTPException(status_code=404, detail="Personality page not found")
 
+@app.get("/fact")
+async def read_fact():
+    """데이터 비교 분석 페이지 제공"""
+    fact_file = os.path.join(static_dir, "fact.html")
+    if os.path.exists(fact_file):
+        return FileResponse(fact_file)
+    raise HTTPException(status_code=404, detail="Fact page not found")
+
 # 서비스 인스턴스
 # 프로젝트 루트의 data 폴더에 저장
 project_root = Path(__file__).parent.parent
@@ -400,6 +408,128 @@ async def list_models():
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"모델 목록 조회 실패: {str(e)}")
+
+
+@app.get("/api/fact")
+async def get_fact_data():
+    """모델 예측 결과와 CSV 데이터 비교 분석"""
+    try:
+        import pandas as pd
+        import numpy as np
+        
+        # CSV 데이터 로드
+        stock_data = load_csv_data_for_llm()
+        if not stock_data:
+            return {
+                "success": False,
+                "message": "주식 데이터를 찾을 수 없습니다."
+            }
+        
+        df = pd.DataFrame(stock_data)
+        
+        # NaN 체크 및 변환 함수
+        def safe_float(value):
+            try:
+                if value is None:
+                    return 0.0
+                if pd.isna(value):
+                    return 0.0
+                if isinstance(value, (int, float)):
+                    if np.isnan(value) or np.isinf(value):
+                        return 0.0
+                result = float(value)
+                if np.isnan(result) or np.isinf(result):
+                    return 0.0
+                return result
+            except (TypeError, ValueError, OverflowError):
+                return 0.0
+        
+        # NaN 값을 0으로 채우기
+        if 'market_cap_usd' in df.columns:
+            df['market_cap_usd'] = df['market_cap_usd'].fillna(0)
+        if 'dividend_yield' in df.columns:
+            df['dividend_yield'] = df['dividend_yield'].fillna(0)
+        
+        # 기본 통계
+        total_stocks = len(df)
+        total_market_cap = safe_float((df['market_cap_usd'] / 1e12).sum()) if 'market_cap_usd' in df.columns else 0.0
+        avg_dividend = safe_float((df['dividend_yield'] * 100).mean()) if 'dividend_yield' in df.columns else 0.0
+        avg_market_cap = safe_float((df['market_cap_usd'] / 1e9).mean()) if 'market_cap_usd' in df.columns else 0.0
+        
+        # 섹터별 분석
+        sector_stats = []
+        if 'gics_sector' in df.columns:
+            sector_groups = df.groupby('gics_sector')
+            for sector, group in sector_groups:
+                avg_mcap = safe_float((group['market_cap_usd'] / 1e9).mean())
+                avg_div = safe_float((group['dividend_yield'] * 100).mean())
+                total_mcap = safe_float((group['market_cap_usd'] / 1e12).sum())
+                
+                sector_stats.append({
+                    "sector": str(sector) if pd.notna(sector) else "UNKNOWN",
+                    "count": int(len(group)),
+                    "avg_market_cap": round(avg_mcap, 2),
+                    "avg_dividend": round(avg_div, 2),
+                    "total_market_cap": round(total_mcap, 2)
+                })
+        
+        # 시가총액 분포
+        market_cap_buckets = {}
+        if 'market_cap_bucket' in df.columns:
+            bucket_counts = df['market_cap_bucket'].value_counts().to_dict()
+            market_cap_buckets = bucket_counts
+        
+        # 배당 프로필 분석
+        dividend_profile_stats = {}
+        if 'dividend_profile' in df.columns:
+            div_profile_counts = df['dividend_profile'].value_counts().to_dict()
+            dividend_profile_stats = div_profile_counts
+        
+        # 상위 종목 (시가총액 기준)
+        top_stocks = []
+        if 'market_cap_usd' in df.columns and 'ticker_primary' in df.columns:
+            top_df = df.nlargest(10, 'market_cap_usd')
+            for _, row in top_df.iterrows():
+                mcap = safe_float(row.get('market_cap_usd', 0) / 1e9)
+                div_yield = safe_float(row.get('dividend_yield', 0) * 100)
+                
+                top_stocks.append({
+                    "ticker": str(row.get('ticker_primary', '?')) if pd.notna(row.get('ticker_primary')) else '?',
+                    "name": str(row.get('name', '?')) if pd.notna(row.get('name')) else '?',
+                    "market_cap": round(mcap, 2),
+                    "dividend_yield": round(div_yield, 2),
+                    "sector": str(row.get('gics_sector', '?')) if pd.notna(row.get('gics_sector')) else '?'
+                })
+        
+        # 모델 정보 (있는 경우)
+        models_info = []
+        try:
+            models = local_ml_service.list_models()
+            models_info = models if isinstance(models, list) else models.get('models', [])
+        except:
+            pass
+        
+        return {
+            "success": True,
+            "timestamp": datetime.now().isoformat(),
+            "summary": {
+                "total_stocks": int(total_stocks),
+                "total_market_cap_trillion": round(safe_float(total_market_cap), 2),
+                "avg_dividend_yield": round(safe_float(avg_dividend), 2),
+                "avg_market_cap_billion": round(safe_float(avg_market_cap), 2)
+            },
+            "sector_analysis": sector_stats,
+            "market_cap_distribution": market_cap_buckets,
+            "dividend_profile_distribution": dividend_profile_stats,
+            "top_stocks": top_stocks,
+            "models_available": len(models_info),
+            "models": models_info
+        }
+    except Exception as e:
+        print(f"❌ Fact 데이터 생성 실패: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"데이터 분석 중 오류 발생: {str(e)}")
 
 
 @app.delete("/api/ml/models/{model_name}")

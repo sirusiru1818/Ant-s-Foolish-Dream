@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>데이터 비교 분석 - Fact Check</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        .pulse-dot {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-50 p-4 md:p-8 font-sans">
+    <div class="max-w-6xl mx-auto space-y-6">
+        
+        <!-- Header -->
+        <div class="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 p-6 md:p-8">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-100 rotate-3">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-black text-slate-900">데이터 비교 분석</h1>
+                        <p class="text-slate-500 font-medium flex items-center gap-2 mt-1">
+                            <span class="w-2 h-2 bg-emerald-500 rounded-full pulse-dot"></span>
+                            실시간 업데이트
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="refreshData()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold text-sm transition-all shadow-lg shadow-blue-100">
+                        🔄 새로고침
+                    </button>
+                    <a href="/" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-2xl font-medium text-sm transition-all">
+                        ← 홈으로
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div id="summary-section" class="grid md:grid-cols-4 gap-4">
+            <!-- Cards will be dynamically generated -->
+        </div>
+
+        <!-- Sector Analysis -->
+        <div class="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 p-6 md:p-8">
+            <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-3">
+                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+                섹터별 분석
+            </h2>
+            <div id="sector-analysis" class="space-y-4">
+                <!-- Sector cards will be dynamically generated -->
+            </div>
+        </div>
+
+        <!-- Top Stocks & Distribution -->
+        <div class="grid md:grid-cols-2 gap-6">
+            <!-- Top Stocks -->
+            <div class="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 p-6 md:p-8">
+                <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-3">
+                    <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                    </svg>
+                    상위 종목 (시가총액)
+                </h2>
+                <div id="top-stocks" class="space-y-3">
+                    <!-- Top stocks will be dynamically generated -->
+                </div>
+            </div>
+
+            <!-- Market Cap Distribution -->
+            <div class="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 p-6 md:p-8">
+                <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-3">
+                    <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                    시가총액 분포
+                </h2>
+                <div id="market-cap-distribution" class="space-y-3">
+                    <!-- Distribution will be dynamically generated -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Models Info -->
+        <div class="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 p-6 md:p-8">
+            <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-3">
+                <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                </svg>
+                모델 정보
+            </h2>
+            <div id="models-info" class="space-y-3">
+                <!-- Models will be dynamically generated -->
+            </div>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loading-indicator" class="hidden fixed inset-0 bg-black/20 flex items-center justify-center z-50">
+            <div class="bg-white rounded-3xl p-8 shadow-2xl">
+                <div class="flex items-center gap-4">
+                    <div class="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                    <span class="text-lg font-bold text-slate-900">데이터 로딩 중...</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const API_BASE_URL = window.location.origin;
+        let autoRefreshInterval = null;
+
+        async function loadFactData() {
+            const loadingIndicator = document.getElementById('loading-indicator');
+            loadingIndicator.classList.remove('hidden');
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/fact`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('Fact 데이터:', data);
+
+                if (data.success) {
+                    if (data.summary) {
+                        renderSummary(data.summary);
+                    }
+                    if (data.sector_analysis) {
+                        renderSectorAnalysis(data.sector_analysis);
+                    }
+                    if (data.top_stocks) {
+                        renderTopStocks(data.top_stocks);
+                    }
+                    if (data.market_cap_distribution) {
+                        renderMarketCapDistribution(data.market_cap_distribution);
+                    }
+                    if (data.models !== undefined) {
+                        renderModelsInfo(data.models, data.models_available || 0);
+                    }
+                } else {
+                    console.error('데이터 로드 실패:', data.message);
+                    // 에러 메시지 표시
+                    document.getElementById('summary-section').innerHTML = `
+                        <div class="col-span-4 bg-red-50 border border-red-200 rounded-3xl p-6 text-center">
+                            <p class="text-red-600 font-bold">데이터 로드 실패: ${data.message || '알 수 없는 오류'}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('API 호출 실패:', error);
+                // 에러 메시지 표시
+                document.getElementById('summary-section').innerHTML = `
+                    <div class="col-span-4 bg-red-50 border border-red-200 rounded-3xl p-6 text-center">
+                        <p class="text-red-600 font-bold">연결 오류: ${error.message}</p>
+                        <p class="text-red-500 text-sm mt-2">서버가 실행 중인지 확인하세요.</p>
+                    </div>
+                `;
+            } finally {
+                loadingIndicator.classList.add('hidden');
+            }
+        }
+
+        function renderSummary(summary) {
+            const container = document.getElementById('summary-section');
+            if (!summary) {
+                container.innerHTML = '<p class="text-slate-400 text-center py-8 col-span-4">요약 데이터가 없습니다.</p>';
+                return;
+            }
+            
+            const totalStocks = summary.total_stocks || 0;
+            const totalCap = summary.total_market_cap_trillion || 0;
+            const avgDiv = summary.avg_dividend_yield || 0;
+            const avgCap = summary.avg_market_cap_billion || 0;
+            
+            container.innerHTML = `
+                <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-3xl p-6 text-white shadow-xl">
+                    <div class="text-sm font-medium opacity-90 mb-1">전체 종목 수</div>
+                    <div class="text-4xl font-black">${totalStocks.toLocaleString()}</div>
+                    <div class="text-sm opacity-75 mt-2">개</div>
+                </div>
+                <div class="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-3xl p-6 text-white shadow-xl">
+                    <div class="text-sm font-medium opacity-90 mb-1">총 시가총액</div>
+                    <div class="text-4xl font-black">$${totalCap.toFixed(2)}</div>
+                    <div class="text-sm opacity-75 mt-2">조 달러</div>
+                </div>
+                <div class="bg-gradient-to-br from-amber-500 to-amber-600 rounded-3xl p-6 text-white shadow-xl">
+                    <div class="text-sm font-medium opacity-90 mb-1">평균 배당률</div>
+                    <div class="text-4xl font-black">${avgDiv.toFixed(2)}</div>
+                    <div class="text-sm opacity-75 mt-2">%</div>
+                </div>
+                <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-3xl p-6 text-white shadow-xl">
+                    <div class="text-sm font-medium opacity-90 mb-1">평균 시가총액</div>
+                    <div class="text-4xl font-black">$${avgCap.toFixed(0)}</div>
+                    <div class="text-sm opacity-75 mt-2">십억 달러</div>
+                </div>
+            `;
+        }
+
+        function renderSectorAnalysis(sectors) {
+            const container = document.getElementById('sector-analysis');
+            if (!sectors || sectors.length === 0) {
+                container.innerHTML = '<p class="text-slate-400 text-center py-8">섹터 데이터가 없습니다.</p>';
+                return;
+            }
+
+            container.innerHTML = sectors.map(sector => {
+                const sectorName = sector.sector || 'UNKNOWN';
+                const count = sector.count || 0;
+                const avgDiv = sector.avg_dividend || 0;
+                const totalCap = sector.total_market_cap || 0;
+                
+                return `
+                <div class="flex items-center justify-between p-5 bg-slate-50 rounded-2xl border border-slate-200 hover:border-blue-300 transition-all">
+                    <div class="flex-1">
+                        <h3 class="font-bold text-slate-900 text-lg mb-2">${sectorName}</h3>
+                        <div class="flex gap-6 text-sm">
+                            <div>
+                                <span class="text-slate-500">종목 수:</span>
+                                <span class="font-bold text-slate-900 ml-2">${count}개</span>
+                            </div>
+                            <div>
+                                <span class="text-slate-500">평균 배당:</span>
+                                <span class="font-bold text-emerald-600 ml-2">${avgDiv.toFixed(2)}%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-2xl font-black text-blue-600">$${totalCap.toFixed(2)}T</div>
+                        <div class="text-xs text-slate-400">시가총액</div>
+                    </div>
+                </div>
+            `;
+            }).join('');
+        }
+
+        function renderTopStocks(stocks) {
+            const container = document.getElementById('top-stocks');
+            if (!stocks || stocks.length === 0) {
+                container.innerHTML = '<p class="text-slate-400 text-center py-8">종목 데이터가 없습니다.</p>';
+                return;
+            }
+
+            container.innerHTML = stocks.map((stock, idx) => {
+                const ticker = stock.ticker || '?';
+                const name = stock.name || '?';
+                const mcap = stock.market_cap || 0;
+                const divYield = stock.dividend_yield || 0;
+                
+                return `
+                <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-200 hover:border-emerald-300 transition-all">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 bg-emerald-600 text-white rounded-xl flex items-center justify-center font-black text-sm">
+                            ${idx + 1}
+                        </div>
+                        <div>
+                            <div class="font-bold text-slate-900">${ticker}</div>
+                            <div class="text-sm text-slate-500">${name}</div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="font-bold text-slate-900">$${mcap.toFixed(0)}B</div>
+                        <div class="text-sm text-emerald-600">배당 ${divYield.toFixed(2)}%</div>
+                    </div>
+                </div>
+            `;
+            }).join('');
+        }
+
+        function renderMarketCapDistribution(distribution) {
+            const container = document.getElementById('market-cap-distribution');
+            if (!distribution || Object.keys(distribution).length === 0) {
+                container.innerHTML = '<p class="text-slate-400 text-center py-8">분포 데이터가 없습니다.</p>';
+                return;
+            }
+
+            const total = Object.values(distribution).reduce((a, b) => a + b, 0);
+            const items = Object.entries(distribution).sort((a, b) => b[1] - a[1]);
+
+            container.innerHTML = items.map(([bucket, count]) => {
+                const percentage = (count / total * 100).toFixed(1);
+                return `
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="font-medium text-slate-700">${bucket}</span>
+                            <span class="text-sm text-slate-500">${count}개 (${percentage}%)</span>
+                        </div>
+                        <div class="h-3 bg-slate-100 rounded-full overflow-hidden">
+                            <div class="h-full bg-gradient-to-r from-amber-400 to-amber-600 rounded-full transition-all duration-500" style="width: ${percentage}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderModelsInfo(models, count) {
+            const container = document.getElementById('models-info');
+            if (count === 0) {
+                container.innerHTML = '<p class="text-slate-400 text-center py-8">사용 가능한 모델이 없습니다.</p>';
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="p-4 bg-indigo-50 rounded-2xl border border-indigo-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="font-bold text-indigo-900">${count}개의 모델 사용 가능</div>
+                            <div class="text-sm text-indigo-600 mt-1">모델 예측 결과와 CSV 데이터 비교 분석</div>
+                        </div>
+                        <a href="/details" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-medium text-sm transition-all">
+                            모델 관리 →
+                        </a>
+                    </div>
+                </div>
+            `;
+        }
+
+        function refreshData() {
+            loadFactData();
+        }
+
+        // 초기 로드 및 자동 새로고침 (30초마다)
+        loadFactData();
+        autoRefreshInterval = setInterval(loadFactData, 30000);
+
+        // 페이지 언로드 시 인터벌 정리
+        window.addEventListener('beforeunload', () => {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+            }
+        });
+    </script>
+</body>
+</html>
