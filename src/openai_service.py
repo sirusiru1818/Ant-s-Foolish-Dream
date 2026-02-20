@@ -49,8 +49,7 @@ class OpenAIService:
                     {"role": "system", "content": "당신은 전문 주식 분석가입니다."},
                     {"role": "user", "content": prompt}
                 ],
-                temperature=0.7,
-                max_tokens=1000
+                max_completion_tokens=1000
             )
             
             return response.choices[0].message.content
@@ -96,8 +95,7 @@ class OpenAIService:
                     {"role": "system", "content": "당신은 전문 투자 자문가입니다. JSON 형식으로만 응답하세요."},
                     {"role": "user", "content": prompt}
                 ],
-                temperature=0.7,
-                max_tokens=1500
+                max_completion_tokens=1500
             )
             
             import json
@@ -145,8 +143,7 @@ class OpenAIService:
                     {"role": "system", "content": "당신은 전문 금융 리포트 작성자입니다."},
                     {"role": "user", "content": prompt}
                 ],
-                temperature=0.7,
-                max_tokens=2000
+                max_completion_tokens=2000
             )
             
             return response.choices[0].message.content

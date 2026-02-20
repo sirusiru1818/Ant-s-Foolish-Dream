@@ -65,15 +65,22 @@ pip install -r requirements.txt
 
 ### 3. 애플리케이션 실행
 
+**기본 실행 (자동 리로드):**
 ```bash
 python run.py
 ```
 
-또는
-
+**리로드 없이 실행 (venv 변경사항 무시):**
 ```bash
-uvicorn src.main:app --reload --host 0.0.0.0 --port 8000 --reload-exclude "venv/*"
+RELOAD=false python run.py
 ```
+
+**또는 직접 uvicorn 실행:**
+```bash
+uvicorn src.main:app --host 0.0.0.0 --port 8000
+```
+
+> **참고**: 개발 중 `venv` 디렉토리의 변경사항으로 인한 불필요한 리로드를 피하려면 `RELOAD=false` 옵션을 사용하거나, 코드 변경 후 수동으로 재시작하세요.
 
 서버가 실행되면 `http://localhost:8000`에서 API를 사용할 수 있습니다.
 

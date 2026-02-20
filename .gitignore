@@ -14,3 +14,9 @@ build/
 .coverage
 htmlcov/
 .DS_Store
+
+# 데이터 폴더 (암호화된 데이터 저장)
+data/
+
+# 정적 파일은 커밋에 포함
+# static/
