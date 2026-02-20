@@ -1,0 +1,25 @@
+# FastAPI 및 웹 서버
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-multipart==0.0.6
+
+# Azure 서비스 SDK
+azure-storage-blob==12.19.0
+azure-ai-ml==1.11.0
+openai>=1.12.0
+azure-identity==1.15.0
+marshmallow<4.0.0,>=3.5  # azure-ai-ml 호환성을 위해 버전 고정
+
+# 데이터 암호화
+cryptography==41.0.7
+
+# 데이터 처리 (선택사항)
+# pandas>=2.2.0
+# numpy>=1.26.0
+
+# 환경 변수 관리
+python-dotenv==1.0.0
+
+# 유틸리티
+pydantic>=2.9.0
+pydantic-settings>=2.5.0
