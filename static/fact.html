@@ -26,27 +26,27 @@
     <div class="max-w-6xl mx-auto space-y-6">
         
         <!-- Header -->
-        <div class="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 p-6 md:p-8">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-4">
-                    <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-100 rotate-3">
-                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="bg-gradient-to-r from-white to-slate-50 rounded-[2rem] md:rounded-[2.5rem] shadow-xl border border-slate-100 p-5 md:p-6 lg:p-8">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div class="flex items-center gap-3 md:gap-4">
+                    <div class="w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl md:rounded-2xl flex items-center justify-center shadow-lg shadow-blue-100 rotate-3">
+                        <svg class="w-7 h-7 md:w-8 md:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                         </svg>
                     </div>
                     <div>
-                        <h1 class="text-3xl font-black text-slate-900">데이터 비교 분석</h1>
-                        <p class="text-slate-500 font-medium flex items-center gap-2 mt-1">
-                            <span class="w-2 h-2 bg-emerald-500 rounded-full pulse-dot"></span>
+                        <h1 class="text-2xl md:text-3xl font-black text-slate-900">데이터 비교 분석</h1>
+                        <p class="text-slate-500 font-medium flex items-center gap-2 mt-1 text-sm">
+                            <span class="w-1.5 h-1.5 md:w-2 md:h-2 bg-emerald-500 rounded-full pulse-dot"></span>
                             실시간 업데이트
                         </p>
                     </div>
                 </div>
-                <div class="flex items-center gap-3">
-                    <button onclick="refreshData()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold text-sm transition-all shadow-lg shadow-blue-100">
+                <div class="flex items-center gap-2 md:gap-3">
+                    <button onclick="refreshData()" class="px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl md:rounded-2xl font-bold text-xs md:text-sm transition-all shadow-md shadow-blue-100 hover:shadow-lg">
                         🔄 새로고침
                     </button>
-                    <a href="/" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-2xl font-medium text-sm transition-all">
+                    <a href="/" class="px-4 py-2 bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300 text-slate-600 rounded-xl md:rounded-2xl font-medium text-xs md:text-sm transition-all shadow-sm hover:shadow-md">
                         ← 홈으로
                     </a>
                 </div>
@@ -54,14 +54,14 @@
         </div>
 
         <!-- Summary Cards -->
-        <div id="summary-section" class="grid md:grid-cols-4 gap-4">
+        <div id="summary-section" class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
             <!-- Cards will be dynamically generated -->
         </div>
 
         <!-- Sector Analysis -->
-        <div class="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 p-6 md:p-8">
-            <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-3">
-                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="bg-white rounded-[2rem] md:rounded-[2.5rem] shadow-xl border border-slate-100 p-5 md:p-6 lg:p-8">
+            <h2 class="text-xl md:text-2xl font-bold text-slate-900 mb-5 md:mb-6 flex items-center gap-2 md:gap-3">
+                <svg class="w-5 h-5 md:w-6 md:h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                 </svg>
                 섹터별 분석
@@ -72,11 +72,11 @@
         </div>
 
         <!-- Top Stocks & Distribution -->
-        <div class="grid md:grid-cols-2 gap-6">
+        <div class="grid md:grid-cols-2 gap-4 md:gap-6">
             <!-- Top Stocks -->
-            <div class="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 p-6 md:p-8">
-                <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-3">
-                    <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="bg-white rounded-[2rem] md:rounded-[2.5rem] shadow-xl border border-slate-100 p-5 md:p-6 lg:p-8">
+                <h2 class="text-xl md:text-2xl font-bold text-slate-900 mb-5 md:mb-6 flex items-center gap-2 md:gap-3">
+                    <svg class="w-5 h-5 md:w-6 md:h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
                     </svg>
                     상위 종목 (시가총액)
@@ -87,9 +87,9 @@
             </div>
 
             <!-- Market Cap Distribution -->
-            <div class="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 p-6 md:p-8">
-                <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-3">
-                    <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="bg-white rounded-[2rem] md:rounded-[2.5rem] shadow-xl border border-slate-100 p-5 md:p-6 lg:p-8">
+                <h2 class="text-xl md:text-2xl font-bold text-slate-900 mb-5 md:mb-6 flex items-center gap-2 md:gap-3">
+                    <svg class="w-5 h-5 md:w-6 md:h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                     </svg>
                     시가총액 분포
@@ -101,9 +101,9 @@
         </div>
 
         <!-- Models Info -->
-        <div class="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 p-6 md:p-8">
-            <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-3">
-                <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="bg-white rounded-[2rem] md:rounded-[2.5rem] shadow-xl border border-slate-100 p-5 md:p-6 lg:p-8">
+            <h2 class="text-xl md:text-2xl font-bold text-slate-900 mb-5 md:mb-6 flex items-center gap-2 md:gap-3">
+                <svg class="w-5 h-5 md:w-6 md:h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
                 </svg>
                 모델 정보
@@ -114,11 +114,11 @@
         </div>
 
         <!-- Loading Indicator -->
-        <div id="loading-indicator" class="hidden fixed inset-0 bg-black/20 flex items-center justify-center z-50">
-            <div class="bg-white rounded-3xl p-8 shadow-2xl">
-                <div class="flex items-center gap-4">
-                    <div class="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                    <span class="text-lg font-bold text-slate-900">데이터 로딩 중...</span>
+        <div id="loading-indicator" class="hidden fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+            <div class="bg-white rounded-2xl md:rounded-3xl p-6 md:p-8 shadow-2xl border border-slate-200">
+                <div class="flex items-center gap-3 md:gap-4">
+                    <div class="w-7 h-7 md:w-8 md:h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                    <span class="text-base md:text-lg font-bold text-slate-900">데이터 로딩 중...</span>
                 </div>
             </div>
         </div>
@@ -195,25 +195,25 @@
             const avgCap = summary.avg_market_cap_billion || 0;
             
             container.innerHTML = `
-                <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-3xl p-6 text-white shadow-xl">
-                    <div class="text-sm font-medium opacity-90 mb-1">전체 종목 수</div>
-                    <div class="text-4xl font-black">${totalStocks.toLocaleString()}</div>
-                    <div class="text-sm opacity-75 mt-2">개</div>
+                <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl md:rounded-3xl p-4 md:p-6 text-white shadow-xl hover:shadow-2xl transition-all">
+                    <div class="text-xs md:text-sm font-medium opacity-90 mb-1">전체 종목 수</div>
+                    <div class="text-2xl md:text-3xl lg:text-4xl font-black">${totalStocks.toLocaleString()}</div>
+                    <div class="text-xs md:text-sm opacity-75 mt-1 md:mt-2">개</div>
                 </div>
-                <div class="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-3xl p-6 text-white shadow-xl">
-                    <div class="text-sm font-medium opacity-90 mb-1">총 시가총액</div>
-                    <div class="text-4xl font-black">$${totalCap.toFixed(2)}</div>
-                    <div class="text-sm opacity-75 mt-2">조 달러</div>
+                <div class="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl md:rounded-3xl p-4 md:p-6 text-white shadow-xl hover:shadow-2xl transition-all">
+                    <div class="text-xs md:text-sm font-medium opacity-90 mb-1">총 시가총액</div>
+                    <div class="text-2xl md:text-3xl lg:text-4xl font-black">$${totalCap.toFixed(2)}</div>
+                    <div class="text-xs md:text-sm opacity-75 mt-1 md:mt-2">조 달러</div>
                 </div>
-                <div class="bg-gradient-to-br from-amber-500 to-amber-600 rounded-3xl p-6 text-white shadow-xl">
-                    <div class="text-sm font-medium opacity-90 mb-1">평균 배당률</div>
-                    <div class="text-4xl font-black">${avgDiv.toFixed(2)}</div>
-                    <div class="text-sm opacity-75 mt-2">%</div>
+                <div class="bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl md:rounded-3xl p-4 md:p-6 text-white shadow-xl hover:shadow-2xl transition-all">
+                    <div class="text-xs md:text-sm font-medium opacity-90 mb-1">평균 배당률</div>
+                    <div class="text-2xl md:text-3xl lg:text-4xl font-black">${avgDiv.toFixed(2)}</div>
+                    <div class="text-xs md:text-sm opacity-75 mt-1 md:mt-2">%</div>
                 </div>
-                <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-3xl p-6 text-white shadow-xl">
-                    <div class="text-sm font-medium opacity-90 mb-1">평균 시가총액</div>
-                    <div class="text-4xl font-black">$${avgCap.toFixed(0)}</div>
-                    <div class="text-sm opacity-75 mt-2">십억 달러</div>
+                <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl md:rounded-3xl p-4 md:p-6 text-white shadow-xl hover:shadow-2xl transition-all">
+                    <div class="text-xs md:text-sm font-medium opacity-90 mb-1">평균 시가총액</div>
+                    <div class="text-2xl md:text-3xl lg:text-4xl font-black">$${avgCap.toFixed(0)}</div>
+                    <div class="text-xs md:text-sm opacity-75 mt-1 md:mt-2">십억 달러</div>
                 </div>
             `;
         }
@@ -232,10 +232,10 @@
                 const totalCap = sector.total_market_cap || 0;
                 
                 return `
-                <div class="flex items-center justify-between p-5 bg-slate-50 rounded-2xl border border-slate-200 hover:border-blue-300 transition-all">
-                    <div class="flex-1">
-                        <h3 class="font-bold text-slate-900 text-lg mb-2">${sectorName}</h3>
-                        <div class="flex gap-6 text-sm">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between p-4 md:p-5 bg-gradient-to-r from-slate-50 to-white rounded-xl md:rounded-2xl border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all">
+                    <div class="flex-1 mb-3 md:mb-0">
+                        <h3 class="font-bold text-slate-900 text-base md:text-lg mb-2">${sectorName}</h3>
+                        <div class="flex flex-wrap gap-4 md:gap-6 text-xs md:text-sm">
                             <div>
                                 <span class="text-slate-500">종목 수:</span>
                                 <span class="font-bold text-slate-900 ml-2">${count}개</span>
@@ -246,8 +246,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class="text-right">
-                        <div class="text-2xl font-black text-blue-600">$${totalCap.toFixed(2)}T</div>
+                    <div class="text-left md:text-right">
+                        <div class="text-xl md:text-2xl font-black text-blue-600">$${totalCap.toFixed(2)}T</div>
                         <div class="text-xs text-slate-400">시가총액</div>
                     </div>
                 </div>
@@ -269,19 +269,19 @@
                 const divYield = stock.dividend_yield || 0;
                 
                 return `
-                <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-200 hover:border-emerald-300 transition-all">
-                    <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 bg-emerald-600 text-white rounded-xl flex items-center justify-center font-black text-sm">
+                <div class="flex items-center justify-between p-4 bg-gradient-to-r from-slate-50 to-white rounded-xl md:rounded-2xl border border-slate-200 hover:border-emerald-300 hover:shadow-md transition-all">
+                    <div class="flex items-center gap-3 md:gap-4">
+                        <div class="w-9 h-9 md:w-10 md:h-10 bg-gradient-to-br from-emerald-600 to-emerald-700 text-white rounded-lg md:rounded-xl flex items-center justify-center font-black text-xs md:text-sm shadow-md">
                             ${idx + 1}
                         </div>
                         <div>
-                            <div class="font-bold text-slate-900">${ticker}</div>
-                            <div class="text-sm text-slate-500">${name}</div>
+                            <div class="font-bold text-slate-900 text-sm md:text-base">${ticker}</div>
+                            <div class="text-xs md:text-sm text-slate-500">${name}</div>
                         </div>
                     </div>
                     <div class="text-right">
-                        <div class="font-bold text-slate-900">$${mcap.toFixed(0)}B</div>
-                        <div class="text-sm text-emerald-600">배당 ${divYield.toFixed(2)}%</div>
+                        <div class="font-bold text-slate-900 text-sm md:text-base">$${mcap.toFixed(0)}B</div>
+                        <div class="text-xs md:text-sm text-emerald-600">배당 ${divYield.toFixed(2)}%</div>
                     </div>
                 </div>
             `;
@@ -322,13 +322,13 @@
             }
 
             container.innerHTML = `
-                <div class="p-4 bg-indigo-50 rounded-2xl border border-indigo-200">
-                    <div class="flex items-center justify-between">
+                <div class="p-4 md:p-5 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl md:rounded-2xl border border-indigo-200 shadow-sm">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                         <div>
-                            <div class="font-bold text-indigo-900">${count}개의 모델 사용 가능</div>
-                            <div class="text-sm text-indigo-600 mt-1">모델 예측 결과와 CSV 데이터 비교 분석</div>
+                            <div class="font-bold text-indigo-900 text-sm md:text-base">${count}개의 모델 사용 가능</div>
+                            <div class="text-xs md:text-sm text-indigo-600 mt-1">모델 예측 결과와 CSV 데이터 비교 분석</div>
                         </div>
-                        <a href="/details" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-medium text-sm transition-all">
+                        <a href="/details" class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white rounded-xl font-medium text-xs md:text-sm transition-all shadow-md hover:shadow-lg">
                             모델 관리 →
                         </a>
                     </div>

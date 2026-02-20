@@ -25,27 +25,30 @@
     <div class="max-w-3xl mx-auto bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-slate-100">
         
         <!-- Intro Section -->
-        <div id="intro-section" class="p-10 md:p-16 text-center space-y-8">
-            <div class="w-24 h-24 bg-blue-600 rounded-[2rem] flex items-center justify-center mx-auto rotate-6 shadow-2xl shadow-blue-200">
-                <img src="/static/content.png" alt="S-MBTI" class="w-20 h-20 object-contain filter brightness-0 invert">
+        <div id="intro-section" class="p-8 md:p-12 lg:p-16 text-center space-y-8">
+            <div class="w-20 h-20 md:w-24 md:h-24 bg-gradient-to-br from-blue-600 to-blue-700 rounded-[1.5rem] md:rounded-[2rem] flex items-center justify-center mx-auto rotate-6 shadow-2xl shadow-blue-200">
+                <img src="/static/content.png" alt="S-MBTI" class="w-16 h-16 md:w-20 md:h-20 object-contain filter brightness-0 invert">
             </div>
-            <div class="space-y-4">
-                <h1 class="text-3xl md:text-4xl font-black text-slate-900 leading-tight">
+            <div class="space-y-3 md:space-y-4">
+                <h1 class="text-2xl md:text-3xl lg:text-4xl font-black text-slate-900 leading-tight">
                     나의 미국 주식 <br/><span class="text-blue-600">S-MBTI 16가지 진단</span>
                 </h1>
-                <p class="text-slate-500 font-medium text-lg leading-relaxed">
-                    나의 투자 인격을 상징하는 캐릭터와 함께 <br/> 2026년 최적의 포트폴리오를 확인하세요.
+                <p class="text-slate-500 font-medium text-base md:text-lg leading-relaxed px-4">
+                    나의 투자 인격을 상징하는 캐릭터와 함께 <br class="hidden md:block"/> 2026년 최적의 포트폴리오를 확인하세요.
                 </p>
             </div>
             <button 
                 onclick="startQuiz()"
-                class="w-full py-6 bg-blue-600 hover:bg-blue-700 text-white rounded-3xl font-bold text-xl shadow-xl shadow-blue-100 transition-all active:scale-95"
+                class="w-full py-5 md:py-6 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-2xl md:rounded-3xl font-bold text-lg md:text-xl shadow-xl shadow-blue-100 transition-all active:scale-95"
             >
                 내 캐릭터 찾으러 가기
             </button>
-            <div class="pt-4">
-                <a href="/" class="text-slate-400 hover:text-blue-600 font-medium text-sm transition-colors">
-                    ← AI 투자 어드바이저로 돌아가기
+            <div class="pt-2 md:pt-4">
+                <a href="/" class="inline-flex items-center gap-2 text-slate-400 hover:text-blue-600 font-medium text-sm transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                    AI 투자 어드바이저로 돌아가기
                 </a>
             </div>
         </div>
@@ -79,8 +82,8 @@
         <div id="result-section" class="hidden p-6 md:p-10 space-y-12 animate-fadeIn">
             <!-- Result Header & Image -->
             <div class="text-center space-y-6">
-                <div class="inline-block px-5 py-2 bg-blue-600 text-white rounded-full text-xs font-black tracking-widest shadow-lg">
-                    MBTI CODE: <span id="mbti-code"></span>
+                <div class="inline-block px-5 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-full text-xs font-black tracking-widest shadow-lg">
+                    MBTI CODE: <span id="mbti-code" class="bg-white/20 px-2 py-0.5 rounded-full"></span>
                 </div>
                 
                 <div class="relative mx-auto w-full max-w-[280px]">
@@ -115,21 +118,21 @@
             </div>
 
             <!-- 2026 Strategy Section -->
-            <div class="bg-slate-900 rounded-[3rem] p-8 md:p-12 text-white shadow-2xl relative overflow-hidden">
+            <div class="bg-gradient-to-br from-slate-900 to-slate-800 rounded-[2.5rem] md:rounded-[3rem] p-6 md:p-8 lg:p-12 text-white shadow-2xl relative overflow-hidden">
                 <div class="absolute top-0 right-0 w-80 h-80 bg-blue-600/20 rounded-full blur-[100px] -mr-40 -mt-40"></div>
-                <div class="relative z-10 space-y-10">
-                    <div class="space-y-4">
-                        <h4 class="flex items-center gap-3 text-2xl font-bold text-blue-400">
-                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="relative z-10 space-y-8 md:space-y-10">
+                    <div class="space-y-3 md:space-y-4">
+                        <h4 class="flex items-center gap-2 md:gap-3 text-xl md:text-2xl font-bold text-blue-400">
+                            <svg class="w-6 h-6 md:w-7 md:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
                             </svg>
                             2026 필승 정밀 전략
                         </h4>
-                        <p id="strategy-text" class="text-slate-300 leading-relaxed text-lg font-medium"></p>
+                        <p id="strategy-text" class="text-slate-300 leading-relaxed text-base md:text-lg font-medium"></p>
                     </div>
                     
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <div class="bg-white/5 p-6 rounded-3xl border border-white/10 space-y-4">
+                    <div class="grid md:grid-cols-2 gap-4 md:gap-6">
+                        <div class="bg-white/5 backdrop-blur-sm p-5 md:p-6 rounded-2xl md:rounded-3xl border border-white/10 space-y-3 md:space-y-4 hover:bg-white/10 transition-all">
                             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                                 <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -138,7 +141,7 @@
                             </p>
                             <div id="core-stocks" class="flex flex-wrap gap-2"></div>
                         </div>
-                        <div class="bg-white/5 p-6 rounded-3xl border border-white/10 space-y-4">
+                        <div class="bg-white/5 backdrop-blur-sm p-5 md:p-6 rounded-2xl md:rounded-3xl border border-white/10 space-y-3 md:space-y-4 hover:bg-white/10 transition-all">
                             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                                 <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -152,37 +155,37 @@
             </div>
 
             <!-- Roadmap -->
-            <div class="space-y-6">
-                <h4 class="flex items-center gap-3 text-xl font-bold text-slate-800 px-2">
-                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="space-y-5 md:space-y-6">
+                <h4 class="flex items-center gap-2 md:gap-3 text-lg md:text-xl font-bold text-slate-800 px-2">
+                    <svg class="w-5 h-5 md:w-6 md:h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                     </svg>
                     향후 12개월 주린이 탈출 로드맵
                 </h4>
-                <div class="grid gap-4">
-                    <div class="flex gap-5 p-6 bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-all">
-                        <div class="w-8 h-8 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-black text-sm shrink-0 shadow-lg shadow-blue-100">1</div>
-                        <p class="font-bold text-slate-700 self-center leading-snug">나의 캐릭터에 맞는 우량주/ETF 1주 직접 사보기</p>
+                <div class="grid gap-3 md:gap-4">
+                    <div class="flex gap-4 md:gap-5 p-5 md:p-6 bg-white rounded-2xl md:rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-all">
+                        <div class="w-8 h-8 rounded-xl md:rounded-2xl bg-gradient-to-br from-blue-600 to-blue-700 text-white flex items-center justify-center font-black text-sm shrink-0 shadow-lg shadow-blue-100">1</div>
+                        <p class="font-bold text-slate-700 self-center leading-snug text-sm md:text-base">나의 캐릭터에 맞는 우량주/ETF 1주 직접 사보기</p>
                     </div>
-                    <div class="flex gap-5 p-6 bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-all">
-                        <div class="w-8 h-8 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-black text-sm shrink-0 shadow-lg shadow-blue-100">2</div>
-                        <p class="font-bold text-slate-700 self-center leading-snug">매달 배당금이나 수익률을 기록하는 '투자 일기' 시작하기</p>
+                    <div class="flex gap-4 md:gap-5 p-5 md:p-6 bg-white rounded-2xl md:rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-all">
+                        <div class="w-8 h-8 rounded-xl md:rounded-2xl bg-gradient-to-br from-blue-600 to-blue-700 text-white flex items-center justify-center font-black text-sm shrink-0 shadow-lg shadow-blue-100">2</div>
+                        <p class="font-bold text-slate-700 self-center leading-snug text-sm md:text-base">매달 배당금이나 수익률을 기록하는 '투자 일기' 시작하기</p>
                     </div>
-                    <div class="flex gap-5 p-6 bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-all">
-                        <div class="w-8 h-8 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-black text-sm shrink-0 shadow-lg shadow-blue-100">3</div>
-                        <p class="font-bold text-slate-700 self-center leading-snug">2026년 하반기 시장 변화에 맞춰 포트폴리오 다시 점검하기</p>
+                    <div class="flex gap-4 md:gap-5 p-5 md:p-6 bg-white rounded-2xl md:rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-all">
+                        <div class="w-8 h-8 rounded-xl md:rounded-2xl bg-gradient-to-br from-blue-600 to-blue-700 text-white flex items-center justify-center font-black text-sm shrink-0 shadow-lg shadow-blue-100">3</div>
+                        <p class="font-bold text-slate-700 self-center leading-snug text-sm md:text-base">2026년 하반기 시장 변화에 맞춰 포트폴리오 다시 점검하기</p>
                     </div>
                 </div>
             </div>
 
             <!-- Action Buttons -->
-            <div class="space-y-4">
-                <a href="/" class="block w-full py-6 bg-blue-600 hover:bg-blue-700 text-white rounded-3xl font-bold text-xl shadow-xl shadow-blue-100 transition-all active:scale-95 text-center">
+            <div class="space-y-3 md:space-y-4">
+                <a href="/" class="block w-full py-5 md:py-6 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-2xl md:rounded-3xl font-bold text-lg md:text-xl shadow-xl shadow-blue-100 transition-all active:scale-95 text-center">
                     AI 어드바이저와 상담하기 →
                 </a>
                 <button 
                     onclick="resetQuiz()"
-                    class="w-full py-6 font-bold text-slate-400 hover:text-blue-600 transition-colors flex items-center justify-center gap-2 bg-slate-50 hover:bg-blue-50 rounded-3xl border border-slate-100 shadow-sm"
+                    class="w-full py-5 md:py-6 font-bold text-slate-400 hover:text-blue-600 transition-colors flex items-center justify-center gap-2 bg-slate-50 hover:bg-blue-50 rounded-2xl md:rounded-3xl border border-slate-100 shadow-sm hover:shadow-md"
                 >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
@@ -262,10 +265,10 @@
             optionsContainer.innerHTML = q.options.map((opt, i) => `
                 <button
                     onclick="handleAnswer('${q.cat}', '${opt.s}')"
-                    class="p-6 text-left border-2 border-slate-100 hover:border-blue-600 hover:bg-blue-50 rounded-3xl transition-all font-bold text-slate-600 hover:text-blue-700 flex justify-between items-center group shadow-sm"
+                    class="p-5 md:p-6 text-left border-2 border-slate-100 hover:border-blue-600 hover:bg-gradient-to-r hover:from-blue-50 hover:to-white rounded-2xl md:rounded-3xl transition-all font-bold text-slate-600 hover:text-blue-700 flex justify-between items-center group shadow-sm hover:shadow-md"
                 >
-                    <span class="text-lg">${opt.t}</span>
-                    <svg class="w-5 h-5 text-slate-300 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <span class="text-base md:text-lg pr-4">${opt.t}</span>
+                    <svg class="w-5 h-5 text-slate-300 group-hover:text-blue-600 group-hover:translate-x-1 transition-all shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                     </svg>
                 </button>
