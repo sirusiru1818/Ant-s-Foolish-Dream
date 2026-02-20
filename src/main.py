@@ -411,9 +411,21 @@ async def delete_model(model_name: str):
         raise HTTPException(status_code=500, detail=f"모델 삭제 실패: {str(e)}")
 
 
+class ChatMessage(BaseModel):
+    role: str  # "user" or "assistant"
+    content: str
+
+
 class ChatRequest(BaseModel):
     message: str
     use_stock_data: bool = True
+    exchange_rate: float = 1450.0
+    session_id: str = "default"  # 세션 ID
+    history: Optional[List[ChatMessage]] = None  # 대화 히스토리
+
+
+# 서버 측 대화 히스토리 저장소 (세션별)
+conversation_history: Dict[str, List[Dict[str, str]]] = {}
 
 
 def load_csv_data_for_llm() -> list:
@@ -518,49 +530,87 @@ async def chat_with_ai(request: ChatRequest):
             stock_count = len(stock_data)
             stock_context = create_full_stock_context(stock_data)
         
-        # 시스템 프롬프트 구성
-        system_prompt = """당신은 전문 주식 투자 어드바이저 AI입니다. 한국어로 친절하게 대화하세요.
+        # 시스템 프롬프트 구성 (데이터 사용 여부에 따라 다르게)
+        base_prompt = """당신은 투자 어드바이저 AI입니다.
 
-당신의 역할:
-1. 제공된 S&P 500 주식 데이터를 직접 분석하여 사용자에게 맞춤형 추천을 제공합니다.
-2. 사용자의 투자 성향, 관심 분야, 예산, 목표에 따라 적합한 종목을 선별합니다.
-3. 데이터에 있는 실제 수치(시가총액, 배당률, 설립연도 등)를 활용하여 구체적으로 분석합니다.
-4. 섹터별 분산, 시가총액 다양화 등 포트폴리오 전략도 제안합니다.
+## 핵심 규칙
+1. **간결하게 답변** - 불필요한 서론/부연 없이 핵심만
+2. **환율: 1달러 = 1,450원** (이 값을 사용, "실시간 제공 불가" 같은 말 금지)
 
-분석 시 활용할 데이터 포인트:
-- market_cap_usd: 시가총액으로 기업 규모 판단
-- dividend_yield: 배당 수익률로 인컴 투자 적합성 판단
-- dividend_profile: DIV_GROWTH(배당성장), HIGH_YIELD(고배당) 등
-- market_cap_bucket: MEGA(초대형), LARGE(대형), MID(중형) 등
-- gics_sector: 섹터별 분산 투자
-- founded: 설립연도로 기업 안정성 판단
-- date_added_to_sp500: S&P 500 편입일로 지수 편입 이력 확인
+## 답변 스타일
+- 짧고 명확하게
+- 핵심 정보 먼저
+- 필요한 것만 말하기
+- 마크다운 형식: **강조**, - 리스트"""
 
-추천 전략:
-1. 안정형: MEGA cap + 배당성장주 + 오래된 기업
-2. 성장형: IT/Healthcare + LARGE cap + 최근 S&P 편입
-3. 인컴형: 고배당 + Utilities/Financials + 배당 지속성
-4. 균형형: 섹터 분산 + 시가총액 다양화
+        if request.use_stock_data and stock_context:
+            # 데이터 기반 모드: 제공된 CSV 데이터만 사용
+            system_prompt = base_prompt + """
 
-중요: 
-- 반드시 제공된 데이터에 있는 종목만 추천하세요.
-- 투자 결정은 개인의 책임이며, 이 추천은 참고용입니다.
-- 구체적인 종목 추천 시 티커와 회사명을 함께 언급하세요."""
+## 데이터 기반 모드 (활성화됨)
+- **반드시 아래 제공된 S&P 500 데이터만 참조하여 답변**
+- 데이터에 있는 종목만 추천 가능
+- 데이터에 없는 정보는 "제공된 데이터에 없습니다"라고 답변
+- 종목 추천 시 데이터의 실제 수치(시가총액, 배당률 등) 인용
 
-        if stock_context:
-            system_prompt += f"\n\n{stock_context}"
+## 답변 예시 (데이터 모드)
+
+질문: "배당주 추천해줘"
+→ **데이터 기반 추천**
+- [데이터에서 배당률 높은 종목 선택]
+- 티커, 배당률, 시가총액 명시
+⚠️ 투자 결정은 개인 책임
+
+""" + stock_context
+        else:
+            # 추론 모드: LLM 자체 지식으로 답변
+            system_prompt = base_prompt + """
+
+## 추론 모드 (데이터 없음)
+- 제공된 주식 데이터가 없음
+- **당신의 학습된 지식을 바탕으로 추론하여 답변**
+- 일반적인 투자 지식, 개념 설명, 시장 트렌드 분석 가능
+- 구체적 수치는 대략적인 값임을 명시
+- "정확한 실시간 데이터는 확인 필요"라고 안내 가능
+
+## 답변 예시 (추론 모드)
+
+질문: "배당주 추천해줘"
+→ **일반적으로 알려진 배당주**
+- JNJ (J&J): 헬스케어, 60년+ 배당 증가
+- PG (P&G): 소비재, 안정적 배당
+💡 정확한 현재 배당률은 별도 확인 필요
+⚠️ 투자 결정은 개인 책임
+
+질문: "PER이 뭐야?"
+→ **PER = 주가 ÷ 주당순이익**
+주가가 이익의 몇 배인지 나타냄.
+- 낮으면 저평가 가능성
+- 높으면 성장 기대 반영"""
+        
+        # 세션별 대화 히스토리 관리
+        session_id = request.session_id
+        if session_id not in conversation_history:
+            conversation_history[session_id] = []
+        
+        # 히스토리가 너무 길면 오래된 것부터 삭제 (최근 10개 대화만 유지)
+        if len(conversation_history[session_id]) > 20:
+            conversation_history[session_id] = conversation_history[session_id][-20:]
+        
+        # 메시지 구성: 시스템 + 히스토리 + 현재 메시지
+        messages = [{"role": "system", "content": system_prompt}]
+        messages.extend(conversation_history[session_id])
+        messages.append({"role": "user", "content": request.message})
         
         # 시스템 프롬프트 길이 확인
         print(f"📝 시스템 프롬프트 길이: {len(system_prompt)} 문자")
         print(f"📊 주식 데이터: {stock_count}개 종목")
+        print(f"💬 대화 히스토리: {len(conversation_history[session_id])}개 메시지")
         
         # OpenAI를 통한 채팅
         response = openai_service.client.chat.completions.create(
             model=openai_service.deployment_name,
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": request.message}
-            ],
+            messages=messages,
             max_completion_tokens=3000
         )
         
@@ -568,12 +618,18 @@ async def chat_with_ai(request: ChatRequest):
         print(f"✅ AI 응답 길이: {len(ai_response) if ai_response else 0} 문자")
         print(f"📄 AI 응답 미리보기: {ai_response[:200] if ai_response else 'None'}...")
         
+        # 대화 히스토리에 현재 대화 추가
+        conversation_history[session_id].append({"role": "user", "content": request.message})
+        conversation_history[session_id].append({"role": "assistant", "content": ai_response})
+        
         return {
             "success": True,
             "response": ai_response,
             "timestamp": datetime.now().isoformat(),
             "data_used": request.use_stock_data and bool(stock_context),
-            "stocks_loaded": stock_count
+            "stocks_loaded": stock_count,
+            "session_id": session_id,
+            "history_count": len(conversation_history[session_id]) // 2
         }
     except Exception as e:
         import traceback

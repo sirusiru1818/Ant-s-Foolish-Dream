@@ -23,8 +23,8 @@
 
         .chat-container {
             width: 100%;
-            max-width: 900px;
-            height: 90vh;
+            max-width: 1000px;
+            height: 92vh;
             background: #1a1a2e;
             border-radius: 16px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
@@ -37,7 +37,7 @@
         .chat-header {
             background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
             color: white;
-            padding: 20px;
+            padding: 16px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -45,13 +45,13 @@
         }
 
         .chat-header-left h1 {
-            font-size: 1.4em;
-            margin-bottom: 5px;
+            font-size: 1.3em;
+            margin-bottom: 4px;
             color: #00d9ff;
         }
 
         .chat-header-left p {
-            font-size: 0.85em;
+            font-size: 0.8em;
             opacity: 0.8;
         }
 
@@ -59,21 +59,21 @@
             display: flex;
             flex-direction: column;
             align-items: flex-end;
-            gap: 8px;
+            gap: 6px;
         }
 
         .data-toggle {
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 0.85em;
+            font-size: 0.8em;
             color: #aaa;
         }
 
         .toggle-switch {
             position: relative;
-            width: 44px;
-            height: 22px;
+            width: 40px;
+            height: 20px;
         }
 
         .toggle-switch input {
@@ -85,24 +85,21 @@
         .toggle-slider {
             position: absolute;
             cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            inset: 0;
             background-color: #333;
-            transition: .4s;
-            border-radius: 22px;
+            transition: .3s;
+            border-radius: 20px;
         }
 
         .toggle-slider:before {
             position: absolute;
             content: "";
-            height: 16px;
-            width: 16px;
+            height: 14px;
+            width: 14px;
             left: 3px;
             bottom: 3px;
             background-color: white;
-            transition: .4s;
+            transition: .3s;
             border-radius: 50%;
         }
 
@@ -111,13 +108,13 @@
         }
 
         input:checked + .toggle-slider:before {
-            transform: translateX(22px);
+            transform: translateX(20px);
         }
 
         .nav-link {
             color: #00d9ff;
             text-decoration: none;
-            font-size: 0.85em;
+            font-size: 0.8em;
             transition: opacity 0.3s;
         }
 
@@ -133,7 +130,7 @@
         }
 
         .chat-messages::-webkit-scrollbar {
-            width: 8px;
+            width: 6px;
         }
 
         .chat-messages::-webkit-scrollbar-track {
@@ -142,24 +139,18 @@
 
         .chat-messages::-webkit-scrollbar-thumb {
             background: #0f3460;
-            border-radius: 4px;
+            border-radius: 3px;
         }
 
         .message {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             display: flex;
             animation: fadeIn 0.3s;
         }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .message.user {
@@ -171,14 +162,14 @@
         }
 
         .message-wrapper {
-            max-width: 75%;
+            max-width: 85%;
         }
 
         .message-content {
-            padding: 14px 18px;
-            border-radius: 12px;
+            padding: 16px 20px;
+            border-radius: 16px;
             word-wrap: break-word;
-            line-height: 1.6;
+            line-height: 1.8;
             font-size: 0.95em;
         }
 
@@ -189,38 +180,245 @@
         }
 
         .message.ai .message-content {
-            background: #1a1a2e;
+            background: #161b22;
             color: #e0e0e0;
-            border: 1px solid #0f3460;
+            border: 1px solid #30363d;
             border-bottom-left-radius: 4px;
         }
 
         .message-label {
             font-size: 0.75em;
             opacity: 0.6;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
             padding: 0 4px;
             color: #888;
         }
 
         .message-meta {
             font-size: 0.7em;
-            margin-top: 6px;
+            margin-top: 8px;
             padding: 0 4px;
             color: #666;
         }
 
         .data-badge {
             display: inline-block;
-            background: #00d9ff20;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+        }
+
+        .data-badge.data-mode {
+            background: #00d9ff15;
             color: #00d9ff;
+            border: 1px solid #00d9ff30;
+        }
+
+        .data-badge.inference-mode {
+            background: #f0883e15;
+            color: #f0883e;
+            border: 1px solid #f0883e30;
+        }
+
+        /* AI 응답 스타일링 */
+        .message.ai .message-content h1,
+        .message.ai .message-content h2,
+        .message.ai .message-content h3 {
+            color: #00d9ff;
+            margin: 20px 0 12px 0;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #30363d;
+        }
+
+        .message.ai .message-content h1:first-child,
+        .message.ai .message-content h2:first-child,
+        .message.ai .message-content h3:first-child {
+            margin-top: 0;
+        }
+
+        .message.ai .message-content h1 { font-size: 1.3em; }
+        .message.ai .message-content h2 { font-size: 1.15em; }
+        .message.ai .message-content h3 { font-size: 1.05em; }
+
+        .message.ai .message-content ul,
+        .message.ai .message-content ol {
+            margin: 12px 0;
+            padding-left: 24px;
+        }
+
+        .message.ai .message-content li {
+            margin: 8px 0;
+            line-height: 1.7;
+        }
+
+        .message.ai .message-content p {
+            margin: 12px 0;
+        }
+
+        .message.ai .message-content strong {
+            color: #58a6ff;
+        }
+
+        .message.ai .message-content em {
+            color: #8b949e;
+            font-style: italic;
+        }
+
+        .message.ai .message-content code {
+            background: #0d1117;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Consolas', monospace;
+            font-size: 0.9em;
+            color: #f0883e;
+        }
+
+        .message.ai .message-content blockquote {
+            border-left: 3px solid #00d9ff;
+            padding-left: 16px;
+            margin: 16px 0;
+            color: #8b949e;
+            background: #0d111730;
+            padding: 12px 16px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .message.ai .message-content hr {
+            border: none;
+            border-top: 1px solid #30363d;
+            margin: 20px 0;
+        }
+
+        /* 주식 티커 하이라이트 */
+        .stock-ticker {
+            display: inline-block;
+            background: linear-gradient(135deg, #238636 0%, #2ea043 100%);
+            color: white;
             padding: 2px 8px;
             border-radius: 4px;
-            font-size: 0.75em;
+            font-weight: 600;
+            font-size: 0.9em;
+            margin: 0 2px;
+        }
+
+        /* 숫자/퍼센트 하이라이트 */
+        .number-highlight {
+            color: #ffa657;
+            font-weight: 500;
+        }
+
+        /* 추천 종목 카드 스타일 */
+        .stock-card {
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 14px 18px;
+            margin: 12px 0;
+            transition: border-color 0.3s;
+        }
+
+        .stock-card:hover {
+            border-color: #00d9ff50;
+        }
+
+        .stock-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .stock-card-ticker {
+            background: linear-gradient(135deg, #238636 0%, #2ea043 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 1em;
+        }
+
+        .stock-card-name {
+            color: #8b949e;
+            font-size: 0.9em;
+        }
+
+        .stock-card-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 8px;
+            font-size: 0.85em;
+        }
+
+        .stock-card-detail {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stock-card-detail-label {
+            color: #6e7681;
+            font-size: 0.8em;
+        }
+
+        .stock-card-detail-value {
+            color: #e0e0e0;
+            font-weight: 500;
+        }
+
+        /* 경고/팁 박스 */
+        .warning-box {
+            background: #5c2a2a30;
+            border-left: 4px solid #f85149;
+            padding: 12px 16px;
+            margin: 16px 0;
+            border-radius: 0 8px 8px 0;
+            color: #f0883e;
+        }
+
+        .tip-box {
+            background: #23863630;
+            border-left: 4px solid #238636;
+            padding: 12px 16px;
+            margin: 16px 0;
+            border-radius: 0 8px 8px 0;
+            color: #7ee787;
+        }
+
+        .info-box {
+            background: #1f6feb30;
+            border-left: 4px solid #1f6feb;
+            padding: 12px 16px;
+            margin: 16px 0;
+            border-radius: 0 8px 8px 0;
+            color: #58a6ff;
+        }
+
+        /* 테이블 스타일 */
+        .message.ai .message-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: 0.9em;
+        }
+
+        .message.ai .message-content th,
+        .message.ai .message-content td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid #30363d;
+        }
+
+        .message.ai .message-content th {
+            background: #21262d;
+            color: #00d9ff;
+            font-weight: 600;
+        }
+
+        .message.ai .message-content tr:hover {
+            background: #21262d50;
         }
 
         .chat-input-container {
-            padding: 20px;
+            padding: 16px 20px;
             background: #1a1a2e;
             border-top: 1px solid #0f3460;
         }
@@ -233,7 +431,7 @@
         .chat-input {
             flex: 1;
             padding: 14px 18px;
-            border: 2px solid #0f3460;
+            border: 2px solid #30363d;
             border-radius: 24px;
             font-size: 1em;
             outline: none;
@@ -243,7 +441,7 @@
         }
 
         .chat-input::placeholder {
-            color: #666;
+            color: #6e7681;
         }
 
         .chat-input:focus {
@@ -275,11 +473,11 @@
         .loading-indicator {
             display: none;
             padding: 14px 18px;
-            background: #1a1a2e;
-            border: 1px solid #0f3460;
+            background: #161b22;
+            border: 1px solid #30363d;
             border-radius: 12px;
-            max-width: 75%;
-            margin-bottom: 15px;
+            max-width: 85%;
+            margin-bottom: 20px;
         }
 
         .loading-indicator.show {
@@ -299,23 +497,12 @@
             animation: typing 1.4s infinite;
         }
 
-        .typing-dots span:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        .typing-dots span:nth-child(3) {
-            animation-delay: 0.4s;
-        }
+        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
 
         @keyframes typing {
-            0%, 60%, 100% {
-                transform: translateY(0);
-                opacity: 0.7;
-            }
-            30% {
-                transform: translateY(-10px);
-                opacity: 1;
-            }
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.7; }
+            30% { transform: translateY(-10px); opacity: 1; }
         }
 
         .error-message {
@@ -331,32 +518,28 @@
             display: inline-block;
             width: 8px;
             height: 8px;
-            background: #00d9ff;
+            background: #3fb950;
             border-radius: 50%;
             margin-right: 8px;
             animation: pulse 2s infinite;
         }
 
         @keyframes pulse {
-            0%, 100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.5;
-            }
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
 
         .suggestion-chips {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
-            margin-top: 12px;
+            margin-top: 16px;
         }
 
         .chip {
-            background: #0f346030;
-            border: 1px solid #0f3460;
-            color: #00d9ff;
+            background: #21262d;
+            border: 1px solid #30363d;
+            color: #58a6ff;
             padding: 8px 14px;
             border-radius: 20px;
             font-size: 0.85em;
@@ -365,19 +548,79 @@
         }
 
         .chip:hover {
-            background: #0f3460;
-            color: white;
-        }
-
-        .stock-highlight {
+            background: #30363d;
+            border-color: #00d9ff;
             color: #00d9ff;
-            font-weight: 600;
         }
 
         .warning-text {
-            color: #ffa500;
+            color: #f0883e;
             font-size: 0.85em;
-            margin-top: 8px;
+            margin-top: 12px;
+            padding: 10px 14px;
+            background: #5c2a2a20;
+            border-radius: 8px;
+            border-left: 3px solid #f0883e;
+        }
+
+        /* 환율 설정 */
+        .exchange-rate-setting {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #21262d;
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid #30363d;
+        }
+
+        .exchange-label {
+            font-size: 0.8em;
+            color: #8b949e;
+        }
+
+        .exchange-input {
+            width: 70px;
+            padding: 4px 8px;
+            border: 1px solid #30363d;
+            border-radius: 4px;
+            background: #0d1117;
+            color: #00d9ff;
+            font-size: 0.85em;
+            font-weight: 600;
+            text-align: right;
+            outline: none;
+        }
+
+        .exchange-input:focus {
+            border-color: #00d9ff;
+        }
+
+        .exchange-input::-webkit-inner-spin-button,
+        .exchange-input::-webkit-outer-spin-button {
+            opacity: 1;
+        }
+
+        .exchange-unit {
+            font-size: 0.8em;
+            color: #8b949e;
+        }
+
+        .reset-btn {
+            background: #21262d;
+            border: 1px solid #30363d;
+            color: #8b949e;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.75em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .reset-btn:hover {
+            background: #30363d;
+            color: #00d9ff;
+            border-color: #00d9ff;
         }
     </style>
 </head>
@@ -386,9 +629,14 @@
         <div class="chat-header">
             <div class="chat-header-left">
                 <h1>📈 주식 추천 AI</h1>
-                <p><span class="status-indicator"></span>CSV 데이터 직접 분석 기반 추천</p>
+                <p><span class="status-indicator"></span>S&P 500 데이터 분석 기반 추천</p>
             </div>
             <div class="chat-header-right">
+                <div class="exchange-rate-setting">
+                    <span class="exchange-label">💱 USD/KRW</span>
+                    <input type="number" id="exchange-rate" value="1450" min="1" step="1" class="exchange-input">
+                    <span class="exchange-unit">원</span>
+                </div>
                 <div class="data-toggle">
                     <span>주식 데이터 사용</span>
                     <label class="toggle-switch">
@@ -396,7 +644,7 @@
                         <span class="toggle-slider"></span>
                     </label>
                 </div>
-                <a href="/details" class="nav-link">ML 모델 관리 →</a>
+                <button class="reset-btn" onclick="resetConversation()" title="대화 초기화">🔄 새 대화</button>
             </div>
         </div>
 
@@ -405,16 +653,17 @@
                 <div class="message-wrapper">
                     <div class="message-label">AI 투자 어드바이저</div>
                     <div class="message-content">
-                        안녕하세요! 저는 <span class="stock-highlight">CSV 데이터를 직접 분석</span>하여 주식을 추천하는 AI입니다.
-                        <br><br>
-                        제가 보유한 S&P 500 데이터를 실시간으로 분석하여 투자 성향, 관심 분야, 예산에 맞는 맞춤형 종목을 추천해 드립니다.
-                        <p class="warning-text">※ 투자 결정은 개인의 책임이며, 이 추천은 참고용입니다.</p>
+                        <h3>안녕하세요! 투자 어드바이저 AI입니다 👋</h3>
+                        <p>저는 <strong>종목 추천</strong>부터 <strong>투자 개념 설명</strong>, <strong>시장 분석</strong>까지 다양한 투자 관련 질문에 답변해 드립니다.</p>
+                        <p>S&P 500 데이터를 보유하고 있어 구체적인 종목 추천도 가능해요. 궁금한 것이 있으면 편하게 물어보세요!</p>
+                        <div class="warning-text">⚠️ 투자 결정은 개인의 책임이며, 이 정보는 참고용입니다.</div>
                         <div class="suggestion-chips">
-                            <span class="chip" onclick="sendSuggestion('배당률 높은 안정적인 종목 추천해줘')">고배당 안정주</span>
-                            <span class="chip" onclick="sendSuggestion('IT 섹터에서 시가총액 큰 종목 분석해줘')">IT 대형주 분석</span>
-                            <span class="chip" onclick="sendSuggestion('분산 투자 포트폴리오 구성해줘')">포트폴리오 구성</span>
-                            <span class="chip" onclick="sendSuggestion('섹터별 대표 종목 비교해줘')">섹터별 비교</span>
-                            <span class="chip" onclick="sendSuggestion('오래된 기업 중 배당성장주 찾아줘')">배당성장주</span>
+                            <span class="chip" onclick="sendSuggestion('배당률 높은 안정적인 종목 추천해줘')">💰 고배당 추천</span>
+                            <span class="chip" onclick="sendSuggestion('PER이 뭐야? 쉽게 설명해줘')">📚 PER 설명</span>
+                            <span class="chip" onclick="sendSuggestion('IT 섹터 대형주 분석해줘')">💻 IT 분석</span>
+                            <span class="chip" onclick="sendSuggestion('초보자가 시작하기 좋은 투자 방법 알려줘')">🌱 초보 가이드</span>
+                            <span class="chip" onclick="sendSuggestion('분산 투자 포트폴리오 구성해줘')">📊 포트폴리오</span>
+                            <span class="chip" onclick="sendSuggestion('금리 인상이 주식에 어떤 영향을 줘?')">📉 금리와 주식</span>
                         </div>
                     </div>
                 </div>
@@ -452,20 +701,80 @@
         const sendButton = document.getElementById('send-button');
         const loadingIndicator = document.getElementById('loading-indicator');
         const useStockDataToggle = document.getElementById('use-stock-data');
+        const exchangeRateInput = document.getElementById('exchange-rate');
+        
+        // 세션 ID 생성 (브라우저 세션 동안 유지)
+        let sessionId = sessionStorage.getItem('chat_session_id');
+        if (!sessionId) {
+            sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            sessionStorage.setItem('chat_session_id', sessionId);
+        }
+        console.log('Session ID:', sessionId);
 
         function scrollToBottom() {
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
         function formatResponse(text) {
-            return text
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\n/g, '<br>')
-                .replace(/(\$[A-Z]{1,5})/g, '<span class="stock-highlight">$1</span>')
-                .replace(/([A-Z]{2,5})\s*\(/g, '<span class="stock-highlight">$1</span> (');
+            if (!text) return '';
+            
+            let formatted = text
+                // 헤딩 (### ## #)
+                .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+                .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+                .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+                
+                // 굵은 글씨
+                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                
+                // 기울임
+                .replace(/\*(.+?)\*/g, '<em>$1</em>')
+                
+                // 인라인 코드
+                .replace(/`(.+?)`/g, '<code>$1</code>')
+                
+                // 주식 티커 하이라이트 (대문자 1-5자)
+                .replace(/\b([A-Z]{1,5})\b(?=\s*[\(\|:]|\s+\()/g, '<span class="stock-ticker">$1</span>')
+                
+                // 숫자/퍼센트 하이라이트
+                .replace(/(\$[\d,.]+[BTM]?|\d+\.?\d*%)/g, '<span class="number-highlight">$1</span>')
+                
+                // 경고 박스
+                .replace(/⚠️(.+?)(?=\n|$)/g, '<div class="warning-box">⚠️$1</div>')
+                
+                // 팁 박스
+                .replace(/💡(.+?)(?=\n|$)/g, '<div class="tip-box">💡$1</div>')
+                
+                // 정보 박스
+                .replace(/ℹ️(.+?)(?=\n|$)/g, '<div class="info-box">ℹ️$1</div>')
+                
+                // 인용구
+                .replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>')
+                
+                // 구분선
+                .replace(/^---$/gm, '<hr>')
+                
+                // 순서 없는 리스트
+                .replace(/^[\-\*] (.+)$/gm, '<li>$1</li>')
+                
+                // 순서 있는 리스트
+                .replace(/^\d+\. (.+)$/gm, '<li>$1</li>')
+                
+                // 줄바꿈
+                .replace(/\n\n/g, '</p><p>')
+                .replace(/\n/g, '<br>');
+            
+            // 연속된 li 태그를 ul로 감싸기
+            formatted = formatted.replace(/(<li>.*?<\/li>)(\s*<br>)*(<li>)/g, '$1$3');
+            formatted = formatted.replace(/(<li>.*?<\/li>)+/g, '<ul>$&</ul>');
+            
+            // 연속된 blockquote 병합
+            formatted = formatted.replace(/<\/blockquote>\s*<br>\s*<blockquote>/g, '<br>');
+            
+            return formatted;
         }
 
-        function addMessage(content, isUser, dataUsed = false, stocksLoaded = 0) {
+        function addMessage(content, isUser, dataUsed = false, stocksLoaded = 0, historyCount = 0) {
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${isUser ? 'user' : 'ai'}`;
             
@@ -473,8 +782,15 @@
             const formattedContent = isUser ? content : formatResponse(content);
             
             let metaHtml = '';
-            if (!isUser && dataUsed) {
-                metaHtml = `<div class="message-meta"><span class="data-badge">📊 CSV 데이터 분석 (${stocksLoaded}개 종목)</span></div>`;
+            if (!isUser) {
+                const badges = [];
+                if (dataUsed) {
+                    badges.push(`📊 데이터 기반 (${stocksLoaded}개 종목)`);
+                } else {
+                    badges.push(`🧠 AI 추론 모드`);
+                }
+                if (historyCount > 0) badges.push(`💬 대화 ${historyCount}회차`);
+                metaHtml = `<div class="message-meta"><span class="data-badge ${dataUsed ? 'data-mode' : 'inference-mode'}">${badges.join(' | ')}</span></div>`;
             }
             
             messageDiv.innerHTML = `
@@ -517,6 +833,8 @@
             scrollToBottom();
 
             try {
+                const exchangeRate = parseFloat(exchangeRateInput.value) || 1450;
+                
                 const response = await fetch(`${API_BASE_URL}/api/chat`, {
                     method: 'POST',
                     headers: {
@@ -524,7 +842,9 @@
                     },
                     body: JSON.stringify({
                         message: userMessage,
-                        use_stock_data: useStockDataToggle.checked
+                        use_stock_data: useStockDataToggle.checked,
+                        exchange_rate: exchangeRate,
+                        session_id: sessionId
                     })
                 });
 
@@ -534,7 +854,7 @@
                 if (response.ok) {
                     const aiMessage = data.response || data.message;
                     if (aiMessage && aiMessage.trim()) {
-                        addMessage(aiMessage, false, data.data_used, data.stocks_loaded);
+                        addMessage(aiMessage, false, data.data_used, data.stocks_loaded, data.history_count);
                     } else {
                         addErrorMessage('AI 응답이 비어있습니다. 콘솔을 확인하세요.');
                         console.error('Empty response:', data);
@@ -558,6 +878,25 @@
                 chatForm.dispatchEvent(new Event('submit'));
             }
         });
+
+        // 대화 초기화 함수
+        function resetConversation() {
+            // 새 세션 ID 생성
+            sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            sessionStorage.setItem('chat_session_id', sessionId);
+            
+            // 화면의 메시지 초기화 (첫 번째 환영 메시지만 유지)
+            const messages = chatMessages.querySelectorAll('.message');
+            messages.forEach((msg, index) => {
+                if (index > 0) msg.remove();
+            });
+            
+            // 에러 메시지도 삭제
+            chatMessages.querySelectorAll('.error-message').forEach(el => el.remove());
+            
+            console.log('New Session ID:', sessionId);
+            chatInput.focus();
+        }
 
         chatInput.focus();
         scrollToBottom();
