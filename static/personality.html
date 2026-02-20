@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>투자 성향 S-MBTI 진단</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        .progress-bar {
+            transition: width 0.5s ease-out;
+        }
+        .score-bar {
+            transition: width 1s ease-out;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-50 p-4 md:p-8 font-sans pb-20">
+    <div class="max-w-3xl mx-auto bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-slate-100">
+        
+        <!-- Intro Section -->
+        <div id="intro-section" class="p-10 md:p-16 text-center space-y-8">
+            <div class="w-24 h-24 bg-blue-600 rounded-[2rem] flex items-center justify-center mx-auto rotate-6 shadow-2xl shadow-blue-200">
+                <svg class="text-white w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                </svg>
+            </div>
+            <div class="space-y-4">
+                <h1 class="text-3xl md:text-4xl font-black text-slate-900 leading-tight">
+                    나의 미국 주식 <br/><span class="text-blue-600">S-MBTI 16가지 진단</span>
+                </h1>
+                <p class="text-slate-500 font-medium text-lg leading-relaxed">
+                    나의 투자 인격을 상징하는 캐릭터와 함께 <br/> 2026년 최적의 포트폴리오를 확인하세요.
+                </p>
+            </div>
+            <button 
+                onclick="startQuiz()"
+                class="w-full py-6 bg-blue-600 hover:bg-blue-700 text-white rounded-3xl font-bold text-xl shadow-xl shadow-blue-100 transition-all active:scale-95"
+            >
+                내 캐릭터 찾으러 가기
+            </button>
+            <div class="pt-4">
+                <a href="/" class="text-slate-400 hover:text-blue-600 font-medium text-sm transition-colors">
+                    ← AI 투자 어드바이저로 돌아가기
+                </a>
+            </div>
+        </div>
+
+        <!-- Quiz Section -->
+        <div id="quiz-section" class="hidden p-8 md:p-12 space-y-10">
+            <div class="space-y-3">
+                <div class="flex justify-between items-end text-xs font-black text-slate-400 uppercase tracking-widest">
+                    <span>내 데이터 분석 중...</span>
+                    <span class="text-blue-600 font-bold"><span id="current-q">1</span> / <span id="total-q">10</span></span>
+                </div>
+                <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                    <div id="progress-bar" class="h-full bg-blue-600 progress-bar" style="width: 10%"></div>
+                </div>
+            </div>
+
+            <div class="min-h-[160px] flex flex-col justify-center gap-3">
+                <div class="flex items-center gap-2 text-blue-600 font-bold text-xs uppercase tracking-tighter">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                    Indicator: <span id="indicator">PH</span>
+                </div>
+                <h2 id="question-text" class="text-xl md:text-2xl font-bold text-slate-800 leading-tight"></h2>
+            </div>
+
+            <div id="options-container" class="grid gap-4"></div>
+        </div>
+
+        <!-- Result Section -->
+        <div id="result-section" class="hidden p-6 md:p-10 space-y-12 animate-fadeIn">
+            <!-- Result Header & Image -->
+            <div class="text-center space-y-6">
+                <div class="inline-block px-5 py-2 bg-blue-600 text-white rounded-full text-xs font-black tracking-widest shadow-lg">
+                    MBTI CODE: <span id="mbti-code"></span>
+                </div>
+                
+                <div class="relative mx-auto w-full max-w-[280px]">
+                    <div class="w-full aspect-[3/4] rounded-3xl bg-slate-100 shadow-2xl border-4 border-slate-100 flex items-center justify-center overflow-hidden">
+                        <img id="result-image" src="" alt="" class="w-full h-full object-cover">
+                        <div id="image-error" class="hidden flex flex-col items-center gap-4 text-slate-400">
+                            <svg class="w-20 h-20 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                            <div class="text-xs font-bold uppercase tracking-widest">Image Loading Error</div>
+                            <div id="image-error-path" class="text-[10px] text-slate-300 text-center px-4"></div>
+                        </div>
+                    </div>
+                    <div class="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-white px-6 py-2 rounded-2xl shadow-lg border border-slate-100 whitespace-nowrap">
+                        <h2 id="type-name" class="text-2xl font-black text-slate-900"></h2>
+                    </div>
+                </div>
+                
+                <p id="type-desc" class="text-slate-500 font-semibold text-lg max-w-lg mx-auto pt-4 leading-relaxed italic"></p>
+            </div>
+
+            <!-- AI Transparency: Horizontal Bars -->
+            <div class="bg-slate-50 rounded-[2.5rem] p-8 border border-slate-200 shadow-sm space-y-8">
+                <div class="flex items-center gap-3 border-b border-slate-200 pb-5">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                    </svg>
+                    <h4 class="text-xl font-bold text-slate-800">성향 분석 상세 리포트</h4>
+                </div>
+                <div id="transparency-bars" class="space-y-10"></div>
+            </div>
+
+            <!-- 2026 Strategy Section -->
+            <div class="bg-slate-900 rounded-[3rem] p-8 md:p-12 text-white shadow-2xl relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-80 h-80 bg-blue-600/20 rounded-full blur-[100px] -mr-40 -mt-40"></div>
+                <div class="relative z-10 space-y-10">
+                    <div class="space-y-4">
+                        <h4 class="flex items-center gap-3 text-2xl font-bold text-blue-400">
+                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                            </svg>
+                            2026 필승 정밀 전략
+                        </h4>
+                        <p id="strategy-text" class="text-slate-300 leading-relaxed text-lg font-medium"></p>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-white/5 p-6 rounded-3xl border border-white/10 space-y-4">
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                추천 바구니 (Core)
+                            </p>
+                            <div id="core-stocks" class="flex flex-wrap gap-2"></div>
+                        </div>
+                        <div class="bg-white/5 p-6 rounded-3xl border border-white/10 space-y-4">
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                                관심 가질 종목
+                            </p>
+                            <div id="pick-stocks" class="flex flex-wrap gap-2"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Roadmap -->
+            <div class="space-y-6">
+                <h4 class="flex items-center gap-3 text-xl font-bold text-slate-800 px-2">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    향후 12개월 주린이 탈출 로드맵
+                </h4>
+                <div class="grid gap-4">
+                    <div class="flex gap-5 p-6 bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-all">
+                        <div class="w-8 h-8 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-black text-sm shrink-0 shadow-lg shadow-blue-100">1</div>
+                        <p class="font-bold text-slate-700 self-center leading-snug">나의 캐릭터에 맞는 우량주/ETF 1주 직접 사보기</p>
+                    </div>
+                    <div class="flex gap-5 p-6 bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-all">
+                        <div class="w-8 h-8 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-black text-sm shrink-0 shadow-lg shadow-blue-100">2</div>
+                        <p class="font-bold text-slate-700 self-center leading-snug">매달 배당금이나 수익률을 기록하는 '투자 일기' 시작하기</p>
+                    </div>
+                    <div class="flex gap-5 p-6 bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-all">
+                        <div class="w-8 h-8 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-black text-sm shrink-0 shadow-lg shadow-blue-100">3</div>
+                        <p class="font-bold text-slate-700 self-center leading-snug">2026년 하반기 시장 변화에 맞춰 포트폴리오 다시 점검하기</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="space-y-4">
+                <a href="/" class="block w-full py-6 bg-blue-600 hover:bg-blue-700 text-white rounded-3xl font-bold text-xl shadow-xl shadow-blue-100 transition-all active:scale-95 text-center">
+                    AI 어드바이저와 상담하기 →
+                </a>
+                <button 
+                    onclick="resetQuiz()"
+                    class="w-full py-6 font-bold text-slate-400 hover:text-blue-600 transition-colors flex items-center justify-center gap-2 bg-slate-50 hover:bg-blue-50 rounded-3xl border border-slate-100 shadow-sm"
+                >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                    처음부터 다시 하기
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="max-w-3xl mx-auto mt-8 text-center px-4">
+        <p class="text-[10px] text-slate-400 leading-relaxed uppercase tracking-widest font-bold">
+            All Characters & Assets for S-MBTI v4.2 | 2026 US Market Focus
+        </p>
+    </div>
+
+    <script>
+        // 질문 데이터
+        const questions = [
+            { id: 1, cat: 'PH', q: "주식으로 번 돈을 언제쯤 실제로 찾아 쓰고 싶으신가요?", options: [{ t: "최소 5년 뒤, 노후 자금으로 쓸 거예요 (P)", s: 'P' }, { t: "1~2년 안에 차를 사거나 여행 갈 때 쓸래요 (H)", s: 'H' }] },
+            { id: 2, cat: 'SV', q: "내가 산 주식이 갑자기 -30% 찍혔다면 어떤 생각이 먼저 드나요?", options: [{ t: "더 떨어지기 전에 얼른 팔아야겠어 (S)", s: 'S' }, { t: "오히려 싸게 살 기회네! 더 사야지 (V)", s: 'V' }] },
+            { id: 3, cat: 'DG', q: "용돈처럼 정기적으로 들어오는 돈(배당)이 좋은가요, 아니면 나중에 크게 한 번에 버는 게 좋은가요?", options: [{ t: "매달 통장에 찍히는 소소한 배당금 (D)", s: 'D' }, { t: "당장은 없어도 나중에 2배 오를 수익 (G)", s: 'G' }] },
+            { id: 4, cat: 'SV', q: "남들은 다 돈 벌었다고 자랑하는데 나만 가만히 있으면 어떤가요?", options: [{ t: "불안하지만 내 원칙을 지키며 참는다 (S)", s: 'S' }, { t: "나도 소외될 수 없지! 바로 따라 산다 (V)", s: 'V' }] },
+            { id: 5, cat: 'LI', q: "투자할 회사를 고를 때 어떤 정보를 더 믿으시나요?", options: [{ t: "회사가 돈을 얼마나 벌었는지 보여주는 숫자 (L)", s: 'L' }, { t: "유명 유튜버나 전문가의 추천과 전망 (I)", s: 'I' }] },
+            { id: 6, cat: 'PH', q: "주식을 샀는데 반년 동안 가격이 하나도 안 변한다면?", options: [{ t: "오른다는 확신이 있다면 묵묵히 기다린다 (P)", s: 'P' }, { t: "답답해서 팔고 다른 종목으로 갈아탄다 (H)", s: 'H' }] },
+            { id: 7, cat: 'LI', q: "주식 공부할 때 어떤 방식이 더 편하신가요?", options: [{ t: "데이터와 리포트를 꼼꼼히 읽는 공부 (L)", s: 'L' }, { t: "세상이 변하는 흐름을 보고 느끼는 공부 (I)", s: 'I' }] },
+            { id: 8, cat: 'DG', q: "현재 내 자산에서 위험하지만 수익이 큰 주식의 비중은 어느 정도가 좋을까요?", options: [{ t: "아주 조금(10% 미만), 잃으면 너무 아파요 (D)", s: 'D' }, { t: "화끈하게(30% 이상), 젊을 때 베팅해야죠 (G)", s: 'G' }] },
+            { id: 9, cat: 'LI', q: "주식 투자가 잘 안 풀렸을 때, 보통 이유는 무엇이라고 생각하시나요?", options: [{ t: "내가 분석을 잘못했거나 공부가 부족했다 (L)", s: 'L' }, { t: "운이 나빴거나 시장 상황이 안 도와줬다 (I)", s: 'I' }] },
+            { id: 10, cat: 'DG', q: "꿈꾸는 투자 성공의 모습은 어떤 것인가요?", options: [{ t: "내 원금을 지키며 은행보다 높은 이자 받기 (D)", s: 'D' }, { t: "대박 종목을 잡아서 자산을 크게 불리기 (G)", s: 'G' }] }
+        ];
+
+        // 16가지 유형 데이터베이스
+        const typeDatabase = {
+            'PSLD': { name: "완벽주의 선비 자산가", img: "PSLD.png", desc: "안정성과 데이터를 중시하는 장기 배당 투자자", strategy: "배당 성장주와 지수 ETF를 8:2 비중으로 구성하여 복리 효과를 누리세요.", stocks: { core: ["SCHD", "VOO"], picks: ["JPM", "KO"] } },
+            'PSLG': { name: "신중한 미래 설계자", img: "PSLG.png", desc: "분석을 통해 미래 성장주를 발굴하고 길게 가져가는 스타일", strategy: "현금흐름이 확실한 우량 성장주(빅테크)에 적립식으로 투자하세요.", stocks: { core: ["QQQM", "VUG"], picks: ["MSFT", "GOOGL"] } },
+            'PSID': { name: "따뜻한 배당 수집가", img: "PSID.png", desc: "직관적으로 신뢰하는 브랜드에서 배당금을 모으는 장기 투자자", strategy: "우리가 실생활에서 자주 쓰는 브랜드 중 배당을 잘 주는 기업에 집중하세요.", stocks: { core: ["DGRO", "VTI"], picks: ["PEP", "PG"] } },
+            'PSIG': { name: "낭만적인 가치 투자자", img: "PSIG.png", desc: "세상을 바꿀 아이디어에 공감하며 동행하는 장기 투자자", strategy: "혁신 기술의 초기 단계에 진입하여 세상이 변할 때까지 기다리는 투자를 권합니다.", stocks: { core: ["VTI", "MGK"], picks: ["AAPL", "DIS"] } },
+            'PVLD': { name: "강심장 배당 전략가", img: "PVLD.png", desc: "위험을 감수하면서도 고수익 배당을 설계하는 분석가", strategy: "커버드콜 ETF나 고배당 섹터를 분석하여 하락장에서도 현금을 창출하세요.", stocks: { core: ["JEPI", "XYLD"], picks: ["VZ", "MO"] } },
+            'PVLG': { name: "냉철한 시스템 투자자", img: "PVLG.png", desc: "변동성을 데이터로 극복하며 위기에 베팅하는 실력파", strategy: "반도체나 AI 인프라 섹터가 급락할 때 데이터를 기반으로 과감히 매수하세요.", stocks: { core: ["SOXX", "SMH"], picks: ["NVDA", "ASML"] } },
+            'PVID': { name: "직관적인 모험 자산가", img: "PVID.png", desc: "변동성을 즐기며 자신의 안목을 믿고 끝까지 버티는 스타일", strategy: "파괴적 혁신을 이끄는 기업 중 본인이 잘 아는 테마에 집중 투자하세요.", stocks: { core: ["VTI", "PLTR"], picks: ["TSLA", "ASML"] } },
+            'PVIG': { name: "꿈을 쫓는 불도저", img: "PVIG.png", desc: "큰 시세 차익을 위해 모든 위험을 감수하는 공격적인 장기파", strategy: "성장 잠재력이 무한한 중소형 혁신주나 레버리지 ETF를 적절히 활용하세요.", stocks: { core: ["TQQQ", "SOXL"], picks: ["PLTR", "IONQ"] } },
+            'HSLD': { name: "기민한 실속파 분석가", img: "HSLD.png", desc: "데이터를 통해 단기 저평가를 찾아 수익을 확정 짓는 스타일", strategy: "실적 발표 시즌 전후의 단기 변동성을 데이터로 분석하여 매매하세요.", stocks: { core: ["SPY", "XLK"], picks: ["META", "AMZN"] } },
+            'HSLG': { name: "기회 포착 전략가", img: "HSLG.png", desc: "안전하게 수익이 날 구간을 분석하여 빠르게 치고 빠지는 타입", strategy: "안전 마진이 확보된 우량주 중 단기 모멘텀이 발생한 종목에 집중하세요.", stocks: { core: ["VOO", "MTUM"], picks: ["NFLX", "COST"] } },
+            'HSID': { name: "유연한 방어 투자자", img: "HSID.png", desc: "시장의 분위기를 읽고 짧은 배당이나 확정 수익을 챙기는 타입", strategy: "시장의 소음에 민감하게 대응하되, 안전한 단기 국채와 배당주를 활용하세요.", stocks: { core: ["SGOV", "JEPI"], picks: ["WMT", "MCD"] } },
+            'HSIG': { name: "감각적인 단기 파이터", img: "HSIG.png", desc: "트렌드 변화를 포착해 성장주로 짧고 굵게 수익을 내는 스타일", strategy: "뉴스나 SNS에서 핫한 테마의 대장주를 빠르게 매매하여 수익을 확보하세요.", stocks: { core: ["QQQ", "IWO"], picks: ["AMD", "MSTR"] } },
+            'HVLD': { name: "데이터 기반 승부사", img: "HVLD.png", desc: "변동성 높은 장세에서 수치로 승부수를 던지는 단기파", strategy: "옵션 지표나 기술적 분석을 통해 단기 고수익 배당/차익 기회를 노리세요.", stocks: { core: ["TSLY", "CONY"], picks: ["SQ", "PYPL"] } },
+            'HVLG': { name: "스피드 중시 전략가", img: "HVLG.png", desc: "공격적인 성장주 매매를 통해 복리보다 스피드를 택한 분석가", strategy: "급등주 중에서도 실적 근거가 있는 종목을 골라 짧은 구간을 먹고 나옵니다.", stocks: { core: ["SOXL", "TQQQ"], picks: ["NVDA", "ARM"] } },
+            'HVID': { name: "감각적인 서핑 투자자", img: "HVID.png", desc: "시장의 파도를 타고 화끈하게 수익을 낸 뒤 현금화하는 타입", strategy: "테마의 순환매를 직관적으로 파악하여 자금을 빠르게 이동시키세요.", stocks: { core: ["TQQQ", "ARM"], picks: ["MIA", "MSTR"] } },
+            'HVIG': { name: "화끈한 트렌드 세터", img: "HVIG.png", desc: "지금 이 순간 가장 뜨거운 종목에 전 재산을 던지는 승부사", strategy: "손절선을 엄격히 잡되, 상승 추세가 꺾이기 전까지는 끝까지 수익을 즐기세요.", stocks: { core: ["SOXL", "LABU"], picks: ["TSLA", "PLTR"] } }
+        };
+
+        // 상태 변수
+        let currentQuestion = 0;
+        let answers = { PH: "", SV: "", LI: "", DG: "" };
+        let mbtiResult = null;
+
+        // DOM 요소
+        const introSection = document.getElementById('intro-section');
+        const quizSection = document.getElementById('quiz-section');
+        const resultSection = document.getElementById('result-section');
+
+        function startQuiz() {
+            introSection.classList.add('hidden');
+            quizSection.classList.remove('hidden');
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('current-q').textContent = currentQuestion + 1;
+            document.getElementById('total-q').textContent = questions.length;
+            document.getElementById('progress-bar').style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
+            document.getElementById('indicator').textContent = q.cat;
+            document.getElementById('question-text').textContent = q.q;
+
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = q.options.map((opt, i) => `
+                <button
+                    onclick="handleAnswer('${q.cat}', '${opt.s}')"
+                    class="p-6 text-left border-2 border-slate-100 hover:border-blue-600 hover:bg-blue-50 rounded-3xl transition-all font-bold text-slate-600 hover:text-blue-700 flex justify-between items-center group shadow-sm"
+                >
+                    <span class="text-lg">${opt.t}</span>
+                    <svg class="w-5 h-5 text-slate-300 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+            `).join('');
+        }
+
+        function handleAnswer(cat, score) {
+            answers[cat] += score;
+            currentQuestion++;
+
+            if (currentQuestion >= questions.length) {
+                calculateMBTI();
+            } else {
+                renderQuestion();
+            }
+        }
+
+        function calculateMBTI() {
+            let result = "";
+            result += (answers.PH.split('P').length > answers.PH.split('H').length) ? 'P' : 'H';
+            result += (answers.SV.split('S').length > answers.SV.split('V').length) ? 'S' : 'V';
+            result += (answers.LI.split('L').length > answers.LI.split('I').length) ? 'L' : 'I';
+            result += (answers.DG.split('D').length > answers.DG.split('G').length) ? 'D' : 'G';
+            
+            mbtiResult = result;
+            showResult();
+        }
+
+        function showResult() {
+            quizSection.classList.add('hidden');
+            resultSection.classList.remove('hidden');
+
+            const type = typeDatabase[mbtiResult];
+            
+            document.getElementById('mbti-code').textContent = mbtiResult;
+            
+            // 이미지 경로 설정 및 로딩 처리
+            const imageElement = document.getElementById('result-image');
+            const imageErrorDiv = document.getElementById('image-error');
+            const imagePath = `/static/person_image/${type.img}`;
+            
+            // 에러 상태 초기화
+            imageElement.classList.remove('hidden');
+            imageErrorDiv.classList.add('hidden');
+            
+            // 이미지 로드 이벤트 핸들러
+            imageElement.onload = function() {
+                console.log('✅ 이미지 로드 성공:', imagePath);
+                imageElement.classList.remove('hidden');
+                imageErrorDiv.classList.add('hidden');
+            };
+            
+            imageElement.onerror = function() {
+                const fullPath = window.location.origin + imagePath;
+                console.error('❌ 이미지 로드 실패:', imagePath);
+                console.error('시도한 전체 경로:', fullPath);
+                imageElement.classList.add('hidden');
+                imageErrorDiv.classList.remove('hidden');
+                // 에러 메시지에 경로 표시
+                const errorPathElement = document.getElementById('image-error-path');
+                if (errorPathElement) {
+                    errorPathElement.textContent = `경로: ${fullPath}`;
+                }
+            };
+            
+            // 이미지 경로 설정
+            imageElement.src = imagePath;
+            imageElement.alt = type.name;
+            
+            document.getElementById('type-name').textContent = type.name;
+            document.getElementById('type-desc').textContent = `"${type.desc}"`;
+            document.getElementById('strategy-text').textContent = type.strategy;
+
+            // Core stocks
+            const coreStocks = document.getElementById('core-stocks');
+            coreStocks.innerHTML = type.stocks.core.map(s => 
+                `<span class="bg-blue-600/90 px-3 py-1.5 rounded-xl text-xs font-bold border border-blue-400/30">${s}</span>`
+            ).join('');
+
+            // Pick stocks
+            const pickStocks = document.getElementById('pick-stocks');
+            pickStocks.innerHTML = type.stocks.picks.map(s => 
+                `<span class="bg-white/10 px-3 py-1.5 rounded-xl text-xs font-bold border border-white/20">${s}</span>`
+            ).join('');
+
+            // Transparency bars
+            renderTransparencyBars();
+        }
+
+        function renderTransparencyBars() {
+            const scores = {
+                PH: (answers.PH.split(mbtiResult[0]).length - 1) / 2 * 100,
+                SV: (answers.SV.split(mbtiResult[1]).length - 1) / 2 * 100,
+                LI: (answers.LI.split(mbtiResult[2]).length - 1) / 3 * 100,
+                DG: (answers.DG.split(mbtiResult[3]).length - 1) / 3 * 100
+            };
+
+            const data = [
+                { label: "투자 기간 (인내심)", score: scores.PH, color: "bg-blue-500", desc: mbtiResult[0] === 'P' ? "장기적으로 시간을 내 편으로 만드는 스타일" : "빠른 수익을 위해 기민하게 움직이는 스타일" },
+                { label: "위험 감수 (대범함)", score: scores.SV, color: "bg-red-500", desc: mbtiResult[1] === 'S' ? "원금을 지키려는 방어 본능이 강함" : "변동성을 수익의 기회로 보는 공격성" },
+                { label: "판단 기준 (분석력)", score: scores.LI, color: "bg-indigo-500", desc: mbtiResult[2] === 'L' ? "숫자와 데이터를 최우선으로 분석" : "직관과 세상의 흐름을 읽는 감각" },
+                { label: "투자 목표 (수익형)", score: scores.DG, color: "bg-emerald-500", desc: mbtiResult[3] === 'D' ? "따박따박 들어오는 현금 흐름 선호" : "자산의 폭발적인 성장을 추구" }
+            ];
+
+            const container = document.getElementById('transparency-bars');
+            container.innerHTML = data.map(item => `
+                <div class="space-y-3">
+                    <div class="flex justify-between items-end">
+                        <h5 class="font-bold text-slate-700 text-sm md:text-base">${item.label}</h5>
+                        <span class="text-xl font-black text-slate-900">${Math.round(item.score)}%</span>
+                    </div>
+                    <div class="relative h-5 w-full bg-white rounded-full border border-slate-200 overflow-hidden shadow-inner">
+                        <div class="h-full ${item.color} score-bar" style="width: 0%"></div>
+                    </div>
+                    <p class="text-xs text-slate-500 font-medium leading-relaxed italic">${item.desc}</p>
+                </div>
+            `).join('');
+
+            // Animate bars after render
+            setTimeout(() => {
+                const bars = container.querySelectorAll('.score-bar');
+                data.forEach((item, idx) => {
+                    bars[idx].style.width = `${item.score}%`;
+                });
+            }, 100);
+        }
+
+        // showImageError 함수는 더 이상 사용하지 않음 (onerror 핸들러로 대체)
+
+        function resetQuiz() {
+            currentQuestion = 0;
+            answers = { PH: "", SV: "", LI: "", DG: "" };
+            mbtiResult = null;
+            
+            resultSection.classList.add('hidden');
+            introSection.classList.remove('hidden');
+            
+            document.getElementById('result-image').classList.remove('hidden');
+            document.getElementById('image-error').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>

@@ -46,6 +46,7 @@ app.add_middleware(
 )
 
 # 정적 파일 서빙 (프론트엔드)
+# static 폴더에 person_image도 포함되어 있으므로 별도 마운트 불필요
 static_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static")
 if os.path.exists(static_dir):
     app.mount("/static", StaticFiles(directory=static_dir), name="static")
@@ -70,6 +71,14 @@ async def read_details():
     if os.path.exists(details_file):
         return FileResponse(details_file)
     raise HTTPException(status_code=404, detail="Details page not found")
+
+@app.get("/personality")
+async def read_personality():
+    """투자 성향 S-MBTI 진단 페이지 제공"""
+    personality_file = os.path.join(static_dir, "personality.html")
+    if os.path.exists(personality_file):
+        return FileResponse(personality_file)
+    raise HTTPException(status_code=404, detail="Personality page not found")
 
 # 서비스 인스턴스
 # 프로젝트 루트의 data 폴더에 저장
