@@ -413,12 +413,92 @@ async def delete_model(model_name: str):
 
 class ChatRequest(BaseModel):
     message: str
+    use_stock_data: bool = True
+
+
+def load_csv_data_for_llm() -> list:
+    """CSV 파일에서 주식 데이터를 직접 로드"""
+    stock_data = []
+    
+    try:
+        import pandas as pd
+        
+        # data/training 폴더에서 CSV 파일 찾기
+        training_path = data_dir / "training"
+        csv_files = list(training_path.glob("*.csv"))
+        
+        # CSV가 없으면 Excel 파일도 확인
+        if not csv_files:
+            excel_files = list(training_path.glob("*.xlsx"))
+            if excel_files:
+                latest_file = max(excel_files, key=lambda x: x.stat().st_mtime)
+                df = pd.read_excel(latest_file)
+            else:
+                return []
+        else:
+            latest_file = max(csv_files, key=lambda x: x.stat().st_mtime)
+            df = pd.read_csv(latest_file)
+        
+        stock_data = df.to_dict('records')
+        print(f"✅ 주식 데이터 로드 완료: {len(stock_data)}개 종목")
+        
+    except Exception as e:
+        print(f"❌ 주식 데이터 로드 실패: {e}")
+    
+    return stock_data
+
+
+def create_full_stock_context(stock_data: list) -> str:
+    """LLM이 분석할 수 있도록 전체 주식 데이터를 컨텍스트로 변환 (압축 형식)"""
+    if not stock_data:
+        return ""
+    
+    # 섹터별로 그룹화
+    sector_stocks = {}
+    for stock in stock_data:
+        sector = stock.get("gics_sector", stock.get("gics_sector_full", "UNKNOWN"))
+        if sector not in sector_stocks:
+            sector_stocks[sector] = []
+        sector_stocks[sector].append(stock)
+    
+    context_parts = [
+        f"# S&P 500 데이터 ({len(stock_data)}개)",
+        ""
+    ]
+    
+    # 각 섹터별 종목 (간결한 형식)
+    for sector, stocks in sorted(sector_stocks.items()):
+        # 시가총액 순 정렬
+        sorted_stocks = sorted(stocks, key=lambda x: x.get("market_cap_usd", 0) or 0, reverse=True)
+        
+        context_parts.append(f"## {sector} ({len(stocks)}개)")
+        
+        for s in sorted_stocks:
+            ticker = s.get("ticker_primary", "?")
+            name = s.get("name", "?")
+            cap = (s.get("market_cap_usd", 0) or 0) / 1e9
+            div = (s.get("dividend_yield", 0) or 0) * 100
+            bucket = s.get("market_cap_bucket", "?")
+            founded = s.get("founded", "?")
+            div_profile = s.get("dividend_profile", "?")
+            
+            context_parts.append(f"{ticker}|{name}|${cap:.0f}B|{bucket}|배당{div:.1f}%|{div_profile}|설립{founded}")
+        
+        context_parts.append("")
+    
+    # 간단한 통계
+    total_cap = sum(s.get("market_cap_usd", 0) or 0 for s in stock_data) / 1e12
+    avg_div = sum(s.get("dividend_yield", 0) or 0 for s in stock_data) / len(stock_data) * 100
+    
+    context_parts.append(f"총시총: ${total_cap:.1f}T, 평균배당: {avg_div:.2f}%")
+    
+    return "\n".join(context_parts)
 
 
 @app.post("/api/chat")
 async def chat_with_ai(request: ChatRequest):
     """
-    AI와 채팅
+    AI와 채팅 (CSV 데이터 기반 주식 추천)
     
     Args:
         request: 채팅 메시지
@@ -430,24 +510,74 @@ async def chat_with_ai(request: ChatRequest):
         raise HTTPException(status_code=503, detail="OpenAI 서비스가 설정되지 않았습니다. .env 파일에 Azure OpenAI 설정을 추가하세요.")
     
     try:
+        # CSV 주식 데이터 로드
+        stock_context = ""
+        stock_count = 0
+        if request.use_stock_data:
+            stock_data = load_csv_data_for_llm()
+            stock_count = len(stock_data)
+            stock_context = create_full_stock_context(stock_data)
+        
+        # 시스템 프롬프트 구성
+        system_prompt = """당신은 전문 주식 투자 어드바이저 AI입니다. 한국어로 친절하게 대화하세요.
+
+당신의 역할:
+1. 제공된 S&P 500 주식 데이터를 직접 분석하여 사용자에게 맞춤형 추천을 제공합니다.
+2. 사용자의 투자 성향, 관심 분야, 예산, 목표에 따라 적합한 종목을 선별합니다.
+3. 데이터에 있는 실제 수치(시가총액, 배당률, 설립연도 등)를 활용하여 구체적으로 분석합니다.
+4. 섹터별 분산, 시가총액 다양화 등 포트폴리오 전략도 제안합니다.
+
+분석 시 활용할 데이터 포인트:
+- market_cap_usd: 시가총액으로 기업 규모 판단
+- dividend_yield: 배당 수익률로 인컴 투자 적합성 판단
+- dividend_profile: DIV_GROWTH(배당성장), HIGH_YIELD(고배당) 등
+- market_cap_bucket: MEGA(초대형), LARGE(대형), MID(중형) 등
+- gics_sector: 섹터별 분산 투자
+- founded: 설립연도로 기업 안정성 판단
+- date_added_to_sp500: S&P 500 편입일로 지수 편입 이력 확인
+
+추천 전략:
+1. 안정형: MEGA cap + 배당성장주 + 오래된 기업
+2. 성장형: IT/Healthcare + LARGE cap + 최근 S&P 편입
+3. 인컴형: 고배당 + Utilities/Financials + 배당 지속성
+4. 균형형: 섹터 분산 + 시가총액 다양화
+
+중요: 
+- 반드시 제공된 데이터에 있는 종목만 추천하세요.
+- 투자 결정은 개인의 책임이며, 이 추천은 참고용입니다.
+- 구체적인 종목 추천 시 티커와 회사명을 함께 언급하세요."""
+
+        if stock_context:
+            system_prompt += f"\n\n{stock_context}"
+        
+        # 시스템 프롬프트 길이 확인
+        print(f"📝 시스템 프롬프트 길이: {len(system_prompt)} 문자")
+        print(f"📊 주식 데이터: {stock_count}개 종목")
+        
         # OpenAI를 통한 채팅
         response = openai_service.client.chat.completions.create(
             model=openai_service.deployment_name,
             messages=[
-                {"role": "system", "content": "당신은 친절하고 도움이 되는 AI 어시스턴트입니다. 한국어로 자연스럽게 대화하세요."},
+                {"role": "system", "content": system_prompt},
                 {"role": "user", "content": request.message}
             ],
-            max_completion_tokens=1000
+            max_completion_tokens=3000
         )
         
         ai_response = response.choices[0].message.content
+        print(f"✅ AI 응답 길이: {len(ai_response) if ai_response else 0} 문자")
+        print(f"📄 AI 응답 미리보기: {ai_response[:200] if ai_response else 'None'}...")
         
         return {
             "success": True,
             "response": ai_response,
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
+            "data_used": request.use_stock_data and bool(stock_context),
+            "stocks_loaded": stock_count
         }
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"채팅 중 오류 발생: {str(e)}")
 
 

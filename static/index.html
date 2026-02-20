@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI 채팅 테스트</title>
+    <title>주식 추천 AI 채팅</title>
     <style>
         * {
             margin: 0;
@@ -13,7 +13,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -23,38 +23,126 @@
 
         .chat-container {
             width: 100%;
-            max-width: 800px;
+            max-width: 900px;
             height: 90vh;
-            background: white;
+            background: #1a1a2e;
             border-radius: 16px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            border: 1px solid #0f3460;
         }
 
         .chat-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
             color: white;
             padding: 20px;
-            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #0f3460;
         }
 
-        .chat-header h1 {
-            font-size: 1.5em;
+        .chat-header-left h1 {
+            font-size: 1.4em;
             margin-bottom: 5px;
+            color: #00d9ff;
         }
 
-        .chat-header p {
-            font-size: 0.9em;
-            opacity: 0.9;
+        .chat-header-left p {
+            font-size: 0.85em;
+            opacity: 0.8;
+        }
+
+        .chat-header-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
+        }
+
+        .data-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85em;
+            color: #aaa;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 22px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #333;
+            transition: .4s;
+            border-radius: 22px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: #00d9ff;
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(22px);
+        }
+
+        .nav-link {
+            color: #00d9ff;
+            text-decoration: none;
+            font-size: 0.85em;
+            transition: opacity 0.3s;
+        }
+
+        .nav-link:hover {
+            opacity: 0.7;
         }
 
         .chat-messages {
             flex: 1;
             overflow-y: auto;
             padding: 20px;
-            background: #f8f9fa;
+            background: #0d1117;
+        }
+
+        .chat-messages::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: #1a1a2e;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #0f3460;
+            border-radius: 4px;
         }
 
         .message {
@@ -82,38 +170,59 @@
             justify-content: flex-start;
         }
 
+        .message-wrapper {
+            max-width: 75%;
+        }
+
         .message-content {
-            max-width: 70%;
-            padding: 12px 16px;
+            padding: 14px 18px;
             border-radius: 12px;
             word-wrap: break-word;
-            line-height: 1.5;
+            line-height: 1.6;
+            font-size: 0.95em;
         }
 
         .message.user .message-content {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
             color: white;
             border-bottom-right-radius: 4px;
         }
 
         .message.ai .message-content {
-            background: white;
-            color: #333;
-            border: 1px solid #e0e0e0;
+            background: #1a1a2e;
+            color: #e0e0e0;
+            border: 1px solid #0f3460;
             border-bottom-left-radius: 4px;
         }
 
         .message-label {
             font-size: 0.75em;
-            opacity: 0.7;
+            opacity: 0.6;
             margin-bottom: 5px;
             padding: 0 4px;
+            color: #888;
+        }
+
+        .message-meta {
+            font-size: 0.7em;
+            margin-top: 6px;
+            padding: 0 4px;
+            color: #666;
+        }
+
+        .data-badge {
+            display: inline-block;
+            background: #00d9ff20;
+            color: #00d9ff;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75em;
         }
 
         .chat-input-container {
             padding: 20px;
-            background: white;
-            border-top: 1px solid #e0e0e0;
+            background: #1a1a2e;
+            border-top: 1px solid #0f3460;
         }
 
         .chat-input-form {
@@ -123,21 +232,27 @@
 
         .chat-input {
             flex: 1;
-            padding: 12px 16px;
-            border: 2px solid #e0e0e0;
+            padding: 14px 18px;
+            border: 2px solid #0f3460;
             border-radius: 24px;
             font-size: 1em;
             outline: none;
             transition: border-color 0.3s;
+            background: #0d1117;
+            color: white;
+        }
+
+        .chat-input::placeholder {
+            color: #666;
         }
 
         .chat-input:focus {
-            border-color: #667eea;
+            border-color: #00d9ff;
         }
 
         .send-button {
-            padding: 12px 24px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 14px 28px;
+            background: linear-gradient(135deg, #00d9ff 0%, #0f3460 100%);
             color: white;
             border: none;
             border-radius: 24px;
@@ -149,21 +264,21 @@
 
         .send-button:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 5px 20px rgba(0, 217, 255, 0.3);
         }
 
         .send-button:disabled {
-            opacity: 0.6;
+            opacity: 0.5;
             cursor: not-allowed;
         }
 
         .loading-indicator {
             display: none;
-            padding: 12px 16px;
-            background: white;
-            border: 1px solid #e0e0e0;
+            padding: 14px 18px;
+            background: #1a1a2e;
+            border: 1px solid #0f3460;
             border-radius: 12px;
-            max-width: 70%;
+            max-width: 75%;
             margin-bottom: 15px;
         }
 
@@ -179,7 +294,7 @@
         .typing-dots span {
             width: 8px;
             height: 8px;
-            background: #667eea;
+            background: #00d9ff;
             border-radius: 50%;
             animation: typing 1.4s infinite;
         }
@@ -204,19 +319,19 @@
         }
 
         .error-message {
-            background: #fee;
-            color: #c00;
-            padding: 12px 16px;
+            background: #2d1f1f;
+            color: #ff6b6b;
+            padding: 14px 18px;
             border-radius: 12px;
             margin-bottom: 15px;
-            border: 1px solid #fcc;
+            border: 1px solid #5c2a2a;
         }
 
         .status-indicator {
             display: inline-block;
             width: 8px;
             height: 8px;
-            background: #4caf50;
+            background: #00d9ff;
             border-radius: 50%;
             margin-right: 8px;
             animation: pulse 2s infinite;
@@ -230,21 +345,77 @@
                 opacity: 0.5;
             }
         }
+
+        .suggestion-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .chip {
+            background: #0f346030;
+            border: 1px solid #0f3460;
+            color: #00d9ff;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .chip:hover {
+            background: #0f3460;
+            color: white;
+        }
+
+        .stock-highlight {
+            color: #00d9ff;
+            font-weight: 600;
+        }
+
+        .warning-text {
+            color: #ffa500;
+            font-size: 0.85em;
+            margin-top: 8px;
+        }
     </style>
 </head>
 <body>
     <div class="chat-container">
         <div class="chat-header">
-            <h1>🤖 AI 채팅 테스트</h1>
-            <p><span class="status-indicator"></span>Azure OpenAI 연결됨</p>
+            <div class="chat-header-left">
+                <h1>📈 주식 추천 AI</h1>
+                <p><span class="status-indicator"></span>CSV 데이터 직접 분석 기반 추천</p>
+            </div>
+            <div class="chat-header-right">
+                <div class="data-toggle">
+                    <span>주식 데이터 사용</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="use-stock-data" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <a href="/details" class="nav-link">ML 모델 관리 →</a>
+            </div>
         </div>
 
         <div class="chat-messages" id="chat-messages">
             <div class="message ai">
-                <div>
-                    <div class="message-label">AI</div>
+                <div class="message-wrapper">
+                    <div class="message-label">AI 투자 어드바이저</div>
                     <div class="message-content">
-                        안녕하세요! 저는 Azure OpenAI를 사용하는 AI 어시스턴트입니다. 무엇이든 물어보세요! 😊
+                        안녕하세요! 저는 <span class="stock-highlight">CSV 데이터를 직접 분석</span>하여 주식을 추천하는 AI입니다.
+                        <br><br>
+                        제가 보유한 S&P 500 데이터를 실시간으로 분석하여 투자 성향, 관심 분야, 예산에 맞는 맞춤형 종목을 추천해 드립니다.
+                        <p class="warning-text">※ 투자 결정은 개인의 책임이며, 이 추천은 참고용입니다.</p>
+                        <div class="suggestion-chips">
+                            <span class="chip" onclick="sendSuggestion('배당률 높은 안정적인 종목 추천해줘')">고배당 안정주</span>
+                            <span class="chip" onclick="sendSuggestion('IT 섹터에서 시가총액 큰 종목 분석해줘')">IT 대형주 분석</span>
+                            <span class="chip" onclick="sendSuggestion('분산 투자 포트폴리오 구성해줘')">포트폴리오 구성</span>
+                            <span class="chip" onclick="sendSuggestion('섹터별 대표 종목 비교해줘')">섹터별 비교</span>
+                            <span class="chip" onclick="sendSuggestion('오래된 기업 중 배당성장주 찾아줘')">배당성장주</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -264,7 +435,7 @@
                     type="text" 
                     class="chat-input" 
                     id="chat-input" 
-                    placeholder="메시지를 입력하세요..."
+                    placeholder="투자 성향이나 관심 분야를 알려주세요..."
                     autocomplete="off"
                     required
                 >
@@ -280,22 +451,37 @@
         const chatForm = document.getElementById('chat-form');
         const sendButton = document.getElementById('send-button');
         const loadingIndicator = document.getElementById('loading-indicator');
+        const useStockDataToggle = document.getElementById('use-stock-data');
 
-        // 채팅 스크롤을 맨 아래로
         function scrollToBottom() {
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        // 메시지 추가
-        function addMessage(content, isUser) {
+        function formatResponse(text) {
+            return text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\n/g, '<br>')
+                .replace(/(\$[A-Z]{1,5})/g, '<span class="stock-highlight">$1</span>')
+                .replace(/([A-Z]{2,5})\s*\(/g, '<span class="stock-highlight">$1</span> (');
+        }
+
+        function addMessage(content, isUser, dataUsed = false, stocksLoaded = 0) {
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${isUser ? 'user' : 'ai'}`;
             
-            const label = isUser ? '사용자' : 'AI';
+            const label = isUser ? '사용자' : 'AI 투자 어드바이저';
+            const formattedContent = isUser ? content : formatResponse(content);
+            
+            let metaHtml = '';
+            if (!isUser && dataUsed) {
+                metaHtml = `<div class="message-meta"><span class="data-badge">📊 CSV 데이터 분석 (${stocksLoaded}개 종목)</span></div>`;
+            }
+            
             messageDiv.innerHTML = `
-                <div>
+                <div class="message-wrapper">
                     <div class="message-label">${label}</div>
-                    <div class="message-content">${content}</div>
+                    <div class="message-content">${formattedContent}</div>
+                    ${metaHtml}
                 </div>
             `;
             
@@ -303,7 +489,6 @@
             scrollToBottom();
         }
 
-        // 에러 메시지 추가
         function addErrorMessage(message) {
             const errorDiv = document.createElement('div');
             errorDiv.className = 'error-message';
@@ -312,39 +497,48 @@
             scrollToBottom();
         }
 
-        // AI 응답 받기
+        function sendSuggestion(text) {
+            chatInput.value = text;
+            chatForm.dispatchEvent(new Event('submit'));
+        }
+
         async function sendMessage(event) {
             event.preventDefault();
             
             const userMessage = chatInput.value.trim();
             if (!userMessage) return;
 
-            // 사용자 메시지 표시
             addMessage(userMessage, true);
             chatInput.value = '';
             chatInput.disabled = true;
             sendButton.disabled = true;
             
-            // 로딩 표시
             loadingIndicator.classList.add('show');
             scrollToBottom();
 
             try {
-                // 간단한 채팅 API 호출 (주식 분석 API를 채팅으로 활용)
                 const response = await fetch(`${API_BASE_URL}/api/chat`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        message: userMessage
+                        message: userMessage,
+                        use_stock_data: useStockDataToggle.checked
                     })
                 });
 
                 const data = await response.json();
+                console.log('API Response:', data);
 
                 if (response.ok) {
-                    addMessage(data.response || data.message || '응답을 받았습니다.', false);
+                    const aiMessage = data.response || data.message;
+                    if (aiMessage && aiMessage.trim()) {
+                        addMessage(aiMessage, false, data.data_used, data.stocks_loaded);
+                    } else {
+                        addErrorMessage('AI 응답이 비어있습니다. 콘솔을 확인하세요.');
+                        console.error('Empty response:', data);
+                    }
                 } else {
                     addErrorMessage(data.detail || '응답을 받는 중 오류가 발생했습니다.');
                 }
@@ -358,7 +552,6 @@
             }
         }
 
-        // Enter 키로 전송 (Shift+Enter는 줄바꿈)
         chatInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
@@ -366,7 +559,6 @@
             }
         });
 
-        // 초기 포커스
         chatInput.focus();
         scrollToBottom();
     </script>
